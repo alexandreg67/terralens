@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import EconomicDataFetcher from '../components/EconomicDataFetcher';
+import EconomicDataFetcher from '../components/EconomicDataFetcher'; // Current GDP
 import CountrySelector from '../components/CountrySelector';
 import GDPGrowthRateCard from '../components/GDPGrowthRateCard';
 import LifeExpectancyCard from '../components/LifeExpectancyCard';
@@ -18,6 +18,7 @@ const EconomicPage: React.FC = () => {
 
 	return (
 		<div className="container mx-auto p-6">
+			{/* Titre et description */}
 			<div className="text-center mb-6">
 				<h1 className="text-4xl font-bold mb-2 text-primary">
 					Economic Data Dashboard
@@ -29,16 +30,24 @@ const EconomicPage: React.FC = () => {
 					have evolved over time.
 				</p>
 			</div>
+
+			{/* Sélecteur de pays */}
 			<div className="max-w-lg mx-auto mb-6">
 				<CountrySelector
 					selectedCountry={selectedCountry}
 					onCountryChange={handleCountryChange}
 				/>
 			</div>
-			<div className="bg-base-100 p-4 rounded-lg shadow-lg space-y-4">
+
+			{/* Current GDP */}
+			<div className="col-span-1 md:col-span-2 lg:col-span-4 h-full mb-6">
 				<EconomicDataFetcher countryCode={selectedCountry} />
-				<LifeExpectancyCard countryCode={selectedCountry} />
+			</div>
+
+			{/* Cartes des données économiques */}
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				<GDPGrowthRateCard countryCode={selectedCountry} />
+				<LifeExpectancyCard countryCode={selectedCountry} />
 				<UnemploymentRateCard countryCode={selectedCountry} />
 				<PovertyRateCard countryCode={selectedCountry} />
 				<CO2EmissionsCard countryCode={selectedCountry} />

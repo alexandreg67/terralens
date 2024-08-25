@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Footer from './components/Footer';
 
 const Home: React.FC = () => {
 	return (
@@ -14,7 +13,6 @@ const Home: React.FC = () => {
 				</p>
 				<button className="btn btn-primary">Get Started</button>
 			</main>
-			<Footer />
 		</div>
 	);
 };
