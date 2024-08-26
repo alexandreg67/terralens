@@ -1,27 +1,16 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import L, { LatLngBounds } from 'leaflet';
+import React, { useState, useCallback } from 'react';
+import { LatLngBounds } from 'leaflet';
 import { debounce } from 'lodash';
-import 'leaflet/dist/leaflet.css';
-
-const icon = new L.Icon({
-	iconUrl: '/images/marker-icon.png',
-	shadowUrl: '/images/marker-shadow.png',
-	iconRetinaUrl: '/images/marker-icon-2x.png',
-	iconSize: [25, 41],
-	iconAnchor: [12, 41],
-	popupAnchor: [1, -34],
-	shadowSize: [41, 41],
-});
+import RadioFilter from '../components/RadioFilter';
+import MapWithMarkers from '../components/MapWithMarkers';
 
 const GeospatialPage: React.FC = () => {
 	const [stations, setStations] = useState<any[]>([]);
 	const [mapZoom, setMapZoom] = useState(12);
 	const [selectedFilter, setSelectedFilter] = useState<string>('monument');
-	const mapRef = useRef<L.Map | null>(null);
-	const activeRequestRef = useRef<AbortController | null>(null);
+	const activeRequestRef = React.useRef<AbortController | null>(null);
 
 	const generateOverpassQuery = (bounds: LatLngBounds): string => {
 		const southWest = bounds.getSouthWest();
@@ -99,25 +88,6 @@ const GeospatialPage: React.FC = () => {
 		[selectedFilter]
 	);
 
-	const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setSelectedFilter(event.target.value);
-	};
-
-	useEffect(() => {
-		const map = mapRef.current;
-		if (map && selectedFilter) {
-			const onMoveEnd = () =>
-				handleBoundsChange(map.getBounds(), map.getZoom());
-
-			map.on('moveend', onMoveEnd);
-			handleBoundsChange(map.getBounds(), map.getZoom()); // Fetch initial data
-
-			return () => {
-				map.off('moveend', onMoveEnd); // Nettoyer les écouteurs d'événements
-			};
-		}
-	}, [mapRef, handleBoundsChange, selectedFilter]);
-
 	return (
 		<div className="container mx-auto p-6">
 			<div className="text-center mb-6">
@@ -129,102 +99,15 @@ const GeospatialPage: React.FC = () => {
 					at a time.
 				</p>
 			</div>
-			<div className="mb-4 flex justify-center space-x-4">
-				<label className="inline-flex items-center">
-					<input
-						type="radio"
-						name="filter"
-						value="monument"
-						checked={selectedFilter === 'monument'}
-						onChange={handleFilterChange}
-						className="form-radio text-primary"
-					/>
-					<span className="ml-2">Monuments</span>
-				</label>
-				<label className="inline-flex items-center">
-					<input
-						type="radio"
-						name="filter"
-						value="museum"
-						checked={selectedFilter === 'museum'}
-						onChange={handleFilterChange}
-						className="form-radio text-primary"
-					/>
-					<span className="ml-2">Museums</span>
-				</label>
-				<label className="inline-flex items-center">
-					<input
-						type="radio"
-						name="filter"
-						value="park"
-						checked={selectedFilter === 'park'}
-						onChange={handleFilterChange}
-						className="form-radio text-primary"
-					/>
-					<span className="ml-2">Parks</span>
-				</label>
-				<label className="inline-flex items-center">
-					<input
-						type="radio"
-						name="filter"
-						value="viewpoint"
-						checked={selectedFilter === 'viewpoint'}
-						onChange={handleFilterChange}
-						className="form-radio text-primary"
-					/>
-					<span className="ml-2">Viewpoints</span>
-				</label>
-				<label className="inline-flex items-center">
-					<input
-						type="radio"
-						name="filter"
-						value="place_of_worship"
-						checked={selectedFilter === 'place_of_worship'}
-						onChange={handleFilterChange}
-						className="form-radio text-primary"
-					/>
-					<span className="ml-2">Places of Worship</span>
-				</label>
-			</div>
-			<MapContainer
-				center={[48.8566, 2.3522]}
-				zoom={12}
-				style={{ height: '100vh', width: '100%' }}
-				ref={mapRef}
-			>
-				<TileLayer
-					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-				/>
-				{stations.map((station, index) => (
-					<Marker key={index} position={[station.lat, station.lon]} icon={icon}>
-						<Popup>
-							<div>
-								<strong>{station.tags?.name || 'Point of Interest'}</strong>
-								{station.tags?.description && <p>{station.tags.description}</p>}
-								{station.tags?.opening_hours && (
-									<p>
-										<strong>Hours:</strong> {station.tags.opening_hours}
-									</p>
-								)}
-								{station.tags?.wikipedia && (
-									<p>
-										<a
-											href={`https://en.wikipedia.org/wiki/${
-												station.tags.wikipedia.split(':')[1]
-											}`}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Wikipedia
-										</a>
-									</p>
-								)}
-							</div>
-						</Popup>
-					</Marker>
-				))}
-			</MapContainer>
+			<RadioFilter
+				selectedFilter={selectedFilter}
+				onChange={setSelectedFilter}
+			/>
+			<MapWithMarkers
+				stations={stations}
+				mapZoom={mapZoom}
+				onBoundsChange={handleBoundsChange}
+			/>
 		</div>
 	);
 };
