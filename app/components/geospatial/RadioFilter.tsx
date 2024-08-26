@@ -1,3 +1,4 @@
+// components/RadioFilter.tsx
 import React from 'react';
 
 interface RadioFilterProps {
@@ -9,7 +10,7 @@ const RadioFilter: React.FC<RadioFilterProps> = ({
 	selectedFilter,
 	onChange,
 }) => {
-	const filters = [
+	const options = [
 		{ label: 'Monuments', value: 'monument' },
 		{ label: 'Museums', value: 'museum' },
 		{ label: 'Parks', value: 'park' },
@@ -18,18 +19,18 @@ const RadioFilter: React.FC<RadioFilterProps> = ({
 	];
 
 	return (
-		<div className="mb-4 flex justify-center space-x-4">
-			{filters.map((filter) => (
-				<label key={filter.value} className="inline-flex items-center">
+		<div className="flex justify-center space-x-4 my-4">
+			{options.map((option) => (
+				<label key={option.value} className="inline-flex items-center">
 					<input
 						type="radio"
 						name="filter"
-						value={filter.value}
-						checked={selectedFilter === filter.value}
-						onChange={(e) => onChange(e.target.value)}
-						className="form-radio text-primary"
+						value={option.value}
+						checked={selectedFilter === option.value}
+						onChange={() => onChange(option.value)}
+						className="form-radio text-primary focus:ring-primary"
 					/>
-					<span className="ml-2">{filter.label}</span>
+					<span className="ml-2 text-gray-700">{option.label}</span>
 				</label>
 			))}
 		</div>
