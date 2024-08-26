@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { LatLngBounds } from 'leaflet';
 import { debounce } from 'lodash';
-import RadioFilter from '../components/RadioFilter';
-import MapWithMarkers from '../components/MapWithMarkers';
+import RadioFilter from '../components/geospatial/RadioFilter';
+import MapWithMarkers from '../components/geospatial/MapWithMarkers';
 import Spinner from '../components/Spinner';
+import CitySearch from '../components/geospatial/CitySearch';
 
 const GeospatialPage: React.FC = () => {
 	const [stations, setStations] = useState<any[]>([]);
 	const [mapZoom, setMapZoom] = useState(12);
 	const [selectedFilter, setSelectedFilter] = useState<string>('monument');
 	const [loading, setLoading] = useState<boolean>(false);
+	const [center, setCenter] = useState<[number, number]>([48.8566, 2.3522]); // Centre par défaut : Paris
 	const activeRequestRef = React.useRef<AbortController | null>(null);
 
 	const generateOverpassQuery = (bounds: LatLngBounds): string => {
@@ -94,6 +96,19 @@ const GeospatialPage: React.FC = () => {
 		[selectedFilter]
 	);
 
+	const handleCitySelect = (lat: number, lon: number) => {
+		setCenter([lat, lon]);
+		setMapZoom(12); // Réinitialise le zoom si nécessaire
+	};
+
+	useEffect(() => {
+		const bounds = new LatLngBounds(
+			[center[0] - 0.1, center[1] - 0.1], // Création de bornes approximatives autour du centre
+			[center[0] + 0.1, center[1] + 0.1]
+		);
+		fetchStations(bounds);
+	}, [center, selectedFilter]); // Relancer la recherche lorsque le centre ou le filtre change
+
 	return (
 		<div className="container mx-auto p-6">
 			<div className="text-center mb-6">
@@ -105,6 +120,7 @@ const GeospatialPage: React.FC = () => {
 					at a time.
 				</p>
 			</div>
+			<CitySearch onCitySelect={handleCitySelect} />
 			<RadioFilter
 				selectedFilter={selectedFilter}
 				onChange={setSelectedFilter}
@@ -117,6 +133,7 @@ const GeospatialPage: React.FC = () => {
 					stations={stations}
 					mapZoom={mapZoom}
 					onBoundsChange={handleBoundsChange}
+					center={center}
 				/>
 			)}
 		</div>

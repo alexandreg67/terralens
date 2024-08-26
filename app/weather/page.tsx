@@ -3,8 +3,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import _ from 'lodash';
-import WeatherCard from '../components/WeatherCard';
-import WeatherDetailsModal from '../components/WeatherDetailsModal';
+import WeatherCard from '../components/weather/WeatherCard';
+import WeatherDetailsModal from '../components/weather/WeatherDetailsModal';
 
 interface WeatherDataEntry {
 	date: string;

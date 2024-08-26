@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import EconomicDataFetcher from '../components/EconomicDataFetcher'; // Current GDP
-import CountrySelector from '../components/CountrySelector';
-import GDPGrowthRateCard from '../components/GDPGrowthRateCard';
-import LifeExpectancyCard from '../components/LifeExpectancyCard';
-import UnemploymentRateCard from '../components/UnemploymentRateCard';
-import PovertyRateCard from '../components/PovertyRateCard';
-import CO2EmissionsCard from '../components/CO2EmissionsCard';
+import EconomicDataFetcher from '../components/economic/EconomicDataFetcher'; // Current GDP
+import CountrySelector from '../components/economic/CountrySelector';
+import GDPGrowthRateCard from '../components/economic/GDPGrowthRateCard';
+import LifeExpectancyCard from '../components/economic/LifeExpectancyCard';
+import UnemploymentRateCard from '../components/economic/UnemploymentRateCard';
+import PovertyRateCard from '../components/economic/PovertyRateCard';
+import CO2EmissionsCard from '../components/economic/CO2EmissionsCard';
 
 const EconomicPage: React.FC = () => {
 	const [selectedCountry, setSelectedCountry] = useState<string>('US'); // Définir un pays par défaut

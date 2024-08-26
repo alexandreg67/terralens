@@ -1,19 +1,22 @@
 import React, { useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import L, { LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import StationPopup from './StationPopup';
+import SetViewOnChange from './SetViewOnChange';
 
 interface MapWithMarkersProps {
 	stations: any[];
 	mapZoom: number;
 	onBoundsChange: (bounds: LatLngBounds, zoom: number) => void;
+	center: [number, number];
 }
 
 const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 	stations,
 	mapZoom,
 	onBoundsChange,
+	center,
 }) => {
 	const mapRef = useRef<L.Map | null>(null);
 
@@ -22,8 +25,6 @@ const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 		if (map) {
 			const onMoveEnd = () => onBoundsChange(map.getBounds(), map.getZoom());
 			map.on('moveend', onMoveEnd);
-			onBoundsChange(map.getBounds(), map.getZoom());
-
 			return () => {
 				map.off('moveend', onMoveEnd);
 			};
@@ -32,11 +33,12 @@ const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 
 	return (
 		<MapContainer
-			center={[48.8566, 2.3522]}
+			center={center}
 			zoom={mapZoom}
 			style={{ height: '100vh', width: '100%' }}
 			ref={mapRef}
 		>
+			<SetViewOnChange center={center} zoom={mapZoom} />
 			<TileLayer
 				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 				attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
