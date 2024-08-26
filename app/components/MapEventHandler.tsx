@@ -19,7 +19,7 @@ const MapEventHandler = ({
 	useEffect(() => {
 		// Appeler lors du montage pour récupérer les données initiales
 		onBoundsChange(map.getBounds(), map.getZoom());
-	}, [map]);
+	}, [map, onBoundsChange]);
 
 	return null;
 };

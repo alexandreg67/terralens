@@ -5,11 +5,13 @@ import { LatLngBounds } from 'leaflet';
 import { debounce } from 'lodash';
 import RadioFilter from '../components/RadioFilter';
 import MapWithMarkers from '../components/MapWithMarkers';
+import Spinner from '../components/Spinner';
 
 const GeospatialPage: React.FC = () => {
 	const [stations, setStations] = useState<any[]>([]);
 	const [mapZoom, setMapZoom] = useState(12);
 	const [selectedFilter, setSelectedFilter] = useState<string>('monument');
+	const [loading, setLoading] = useState<boolean>(false);
 	const activeRequestRef = React.useRef<AbortController | null>(null);
 
 	const generateOverpassQuery = (bounds: LatLngBounds): string => {
@@ -38,6 +40,7 @@ const GeospatialPage: React.FC = () => {
 	const fetchStations = async (bounds: LatLngBounds) => {
 		if (mapZoom >= 12) {
 			const query = generateOverpassQuery(bounds);
+			setLoading(true); // Début du chargement
 
 			// Annuler la requête précédente si elle est encore en cours
 			if (activeRequestRef.current) {
@@ -76,10 +79,13 @@ const GeospatialPage: React.FC = () => {
 					);
 					setStations([]); // Assurez-vous de vider l'état en cas d'erreur
 				}
+			} finally {
+				setLoading(false); // Fin du chargement
 			}
 		}
 	};
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const handleBoundsChange = useCallback(
 		debounce((bounds: LatLngBounds, zoom: number) => {
 			setMapZoom(zoom);
@@ -103,11 +109,16 @@ const GeospatialPage: React.FC = () => {
 				selectedFilter={selectedFilter}
 				onChange={setSelectedFilter}
 			/>
-			<MapWithMarkers
-				stations={stations}
-				mapZoom={mapZoom}
-				onBoundsChange={handleBoundsChange}
-			/>
+
+			{loading ? (
+				<Spinner />
+			) : (
+				<MapWithMarkers
+					stations={stations}
+					mapZoom={mapZoom}
+					onBoundsChange={handleBoundsChange}
+				/>
+			)}
 		</div>
 	);
 };
