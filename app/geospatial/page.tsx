@@ -134,6 +134,7 @@ const GeospatialPage: React.FC = () => {
 					mapZoom={mapZoom}
 					onBoundsChange={handleBoundsChange}
 					center={center}
+					cityName={''}
 				/>
 			)}
 		</div>

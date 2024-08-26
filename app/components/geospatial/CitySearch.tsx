@@ -184,7 +184,7 @@ const CitySearch: React.FC<CitySearchProps> = ({ onCitySelect }) => {
 	const sliderRef = React.useRef<Slider>(null);
 
 	const settings = {
-		dots: false, // Désactive les points de navigation par défaut de react-slick
+		dots: true, // Désactive les points de navigation par défaut de react-slick
 		infinite: true,
 		speed: 500,
 		slidesToShow: 3,

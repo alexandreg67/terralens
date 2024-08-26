@@ -1,10 +1,17 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @import 'leaflet/dist/leaflet.css';
 
-
 body {
   @apply bg-background text-secondary;
+}
+
+.hero-bg {
+  background-image: url('https://source.unsplash.com/featured/?nature,water');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
