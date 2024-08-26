@@ -1,7 +1,14 @@
 import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
-import WeatherStationMarker from './WeatherStationMarker';
 import 'leaflet/dist/leaflet.css'; // Import du CSS ici
+import { LatLngBounds } from 'leaflet';
+
+import dynamic from 'next/dynamic';
+
+// Import dynamique du composant WeatherStationMarker avec SSR désactivé
+const WeatherStationMarker = dynamic(() => import('./WeatherStationMarker'), {
+	ssr: false,
+});
 
 interface Station {
 	lat: number;
@@ -14,7 +21,8 @@ interface Station {
 interface MapContainerComponentProps {
 	center: [number, number];
 	zoom: number;
-	onMoveEnd?: () => void;
+	onMoveEnd: (bounds: LatLngBounds) => void;
+	children?: React.ReactNode;
 }
 
 const MapContainerComponent: React.FC<MapContainerComponentProps> = ({
@@ -27,21 +35,14 @@ const MapContainerComponent: React.FC<MapContainerComponentProps> = ({
 	return (
 		<div className="p-4">
 			<MapContainer
-				center={center}
-				zoom={zoom}
-				style={{ height: '80vh', width: '100%' }} // Ajout du style ici
+				center={[48.8566, 2.3522]}
+				zoom={13}
+				style={{ height: '100vh', width: '100%' }}
 			>
 				<TileLayer
 					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				/>
-				{stations.map((station, index) => (
-					<WeatherStationMarker
-						key={index}
-						position={[station.lat, station.lon]}
-						name={station.tags?.name}
-					/>
-				))}
 			</MapContainer>
 		</div>
 	);
