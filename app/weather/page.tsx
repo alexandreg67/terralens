@@ -7,7 +7,9 @@ import WeatherDetailsModal from '../components/weather/WeatherDetailsModal';
 import WeatherSearchBar from '../components/weather/WeatherSearchBar';
 import WeatherDisplay from '../components/weather/WeatherDisplay';
 import WeatherOverviewChart from '../components/weather/WeatherOverviewChart';
+import CityHeader from '../components/weather/CityHeader';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
+import { getWeatherData } from '@/app/services/WeatherService';
 
 const useInput = (initialValue: string) => {
 	const [value, setValue] = useState(initialValue);
@@ -43,102 +45,11 @@ const WeatherPage: React.FC = () => {
 			setLoading(true);
 			setError(null);
 
-			const params = {
-				latitude,
-				longitude,
-				hourly: 'temperature_2m,wind_speed_10m,relative_humidity_2m',
-			};
-			const url = 'https://api.open-meteo.com/v1/forecast';
-
 			try {
-				const response = await fetch(`${url}?${new URLSearchParams(params)}`);
-				const data = await response.json();
-
-				if (!data.hourly || !data.hourly.time || !data.hourly.temperature_2m) {
-					throw new Error('Missing or incorrect hourly data');
-				}
-
-				const currentTime = new Date();
-				const currentHour = currentTime.getHours();
-
-				const deriveCondition = (
-					temperature: number,
-					humidity: number,
-					windSpeed: number
-				): string => {
-					if (temperature > 30 && humidity < 40) {
-						return 'Clear';
-					} else if (temperature > 30 && humidity > 60) {
-						return 'Thunderstorm';
-					} else if (humidity > 85 && temperature < 20 && windSpeed < 5) {
-						return 'Fog';
-					} else if (humidity > 70 && windSpeed > 15) {
-						return 'Rain';
-					} else if (windSpeed > 20) {
-						return 'Windy';
-					} else if (humidity > 70 && temperature > 20 && windSpeed < 10) {
-						return 'Partly Cloudy';
-					} else if (temperature < 0) {
-						return 'Snow';
-					} else {
-						return 'Cloudy';
-					}
-				};
-
-				const allData = data.hourly.time.map(
-					(time: string, index: number): WeatherDataEntry => {
-						const dateTime = new Date(time);
-						const hour = dateTime.getHours();
-
-						const condition = deriveCondition(
-							data.hourly.temperature_2m[index],
-							data.hourly.relative_humidity_2m[index],
-							data.hourly.wind_speed_10m[index]
-						);
-
-						return {
-							date: dateTime.toLocaleDateString(),
-							hour,
-							time: dateTime.toLocaleTimeString([], {
-								hour: '2-digit',
-								minute: '2-digit',
-							}),
-							temperature: data.hourly.temperature_2m[index],
-							windSpeed: data.hourly.wind_speed_10m[index],
-							humidity: data.hourly.relative_humidity_2m[index],
-							condition: condition,
-						};
-					}
+				const { groupedFilteredData, groupedAllData } = await getWeatherData(
+					latitude,
+					longitude
 				);
-
-				const filteredData = allData.filter(
-					(entry: WeatherDataEntry) => entry.hour >= currentHour
-				);
-
-				const groupedFilteredData = filteredData.reduce(
-					(
-						acc: Record<string, WeatherDataEntry[]>,
-						entry: WeatherDataEntry
-					) => {
-						if (!acc[entry.date]) acc[entry.date] = [];
-						acc[entry.date].push(entry);
-						return acc;
-					},
-					{}
-				);
-
-				const groupedAllData = allData.reduce(
-					(
-						acc: Record<string, WeatherDataEntry[]>,
-						entry: WeatherDataEntry
-					) => {
-						if (!acc[entry.date]) acc[entry.date] = [];
-						acc[entry.date].push(entry);
-						return acc;
-					},
-					{}
-				);
-
 				setWeatherData(groupedFilteredData);
 				setAllWeatherData(groupedAllData);
 			} catch (error) {
@@ -241,25 +152,12 @@ const WeatherPage: React.FC = () => {
 				error={error}
 			/>
 
-			{/* City name display */}
 			{location.displayCity && (
-				<div className="text-center mb-8">
-					<h3 className="text-2xl font-semibold text-secondary">
-						{location.displayCity}
-					</h3>
-
-					{/* Button to scroll to the chart */}
-					{weatherData && (
-						<div className="mt-4">
-							<button
-								onClick={scrollToChart}
-								className="text-primary font-semibold underline hover:no-underline"
-							>
-								See Weather Trends for {location.displayCity}
-							</button>
-						</div>
-					)}
-				</div>
+				<CityHeader
+					city={location.displayCity}
+					hasWeatherData={!!weatherData}
+					onScrollToChart={scrollToChart}
+				/>
 			)}
 
 			<WeatherDisplay
@@ -285,7 +183,6 @@ const WeatherPage: React.FC = () => {
 				}}
 			/>
 
-			{/* Chart with city name */}
 			{weatherData && (
 				<div id="weather-chart" className="mt-12">
 					<h3 className="text-2xl font-bold text-center mb-4 text-secondary">

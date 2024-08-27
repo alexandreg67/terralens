@@ -6,11 +6,22 @@ export async function GET(req: NextRequest) {
 	const lon = searchParams.get('lon') || '-94.04';
 
 	try {
-		const response = await fetch(
-			`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${process.env.OPENWEATHER_API_KEY}`
-		);
+		// Utilisation de l'API Open-Meteo comme dans votre service
+		const params = {
+			latitude: lat,
+			longitude: lon,
+			hourly: 'temperature_2m,wind_speed_10m,relative_humidity_2m',
+		};
+		const url = 'https://api.open-meteo.com/v1/forecast';
+
+		const response = await fetch(`${url}?${new URLSearchParams(params)}`);
 		const data = await response.json();
 
+		if (!data.hourly || !data.hourly.time || !data.hourly.temperature_2m) {
+			throw new Error('Missing or incorrect hourly data');
+		}
+
+		// Retourner les données telles quelles, ou les transformer si nécessaire
 		return NextResponse.json(data);
 	} catch (error) {
 		console.error('Error fetching weather data:', error);
