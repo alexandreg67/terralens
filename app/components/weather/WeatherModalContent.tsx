@@ -96,24 +96,20 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 			</h3>
 			<div className="flex justify-between mb-6">
 				<div className="text-center">
-					<h4 className="text-lg font-semibold text-primary">
-						Lever du soleil
-					</h4>
+					<h4 className="text-lg font-semibold text-primary">Sunrise</h4>
 					<p className="text-secondary">{sunrise}</p>
 				</div>
 				<div className="text-center">
-					<h4 className="text-lg font-semibold text-primary">
-						Coucher du soleil
-					</h4>
+					<h4 className="text-lg font-semibold text-primary">Sunset</h4>
 					<p className="text-secondary">{sunset}</p>
 				</div>
 			</div>
 			<div className="text-center mb-6">
 				<p className="text-lg">
-					<span className="font-semibold">Température Max:</span> {maxTemp}°C
+					<span className="font-semibold">Max Temperature :</span> {maxTemp}°C
 				</p>
 				<p className="text-lg">
-					<span className="font-semibold">Température Min:</span> {minTemp}°C
+					<span className="font-semibold">Min Temperature :</span> {minTemp}°C
 				</p>
 			</div>
 			<WeatherChart data={data} />

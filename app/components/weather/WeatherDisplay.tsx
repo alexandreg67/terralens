@@ -41,9 +41,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
 				</div>
 			) : (
 				!error && (
-					<p className="text-center text-xl text-error">
-						Aucune donnée disponible
-					</p>
+					<p className="text-center text-xl text-error">No data available</p>
 				)
 			)}
 		</div>

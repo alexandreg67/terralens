@@ -29,7 +29,7 @@ const WeatherChart = ({ data }: { data: any[] }) => {
 		labels: data.map((entry) => entry.time),
 		datasets: [
 			{
-				label: 'Température (°C)',
+				label: 'Temperature (°C)',
 				data: data.map((entry) => entry.temperature),
 				borderColor: '#2C7A7B',
 				backgroundColor: 'rgba(44, 122, 123, 0.2)',
@@ -37,7 +37,7 @@ const WeatherChart = ({ data }: { data: any[] }) => {
 				tension: 0.3,
 			},
 			{
-				label: 'Vitesse du vent (m/s)',
+				label: 'Wind Speed (m/s)',
 				data: data.map((entry) => entry.windSpeed),
 				borderColor: '#E53E3E',
 				backgroundColor: 'rgba(229, 62, 62, 0.2)',
@@ -45,7 +45,7 @@ const WeatherChart = ({ data }: { data: any[] }) => {
 				tension: 0.3,
 			},
 			{
-				label: 'Humidité (%)',
+				label: 'Humidity (%)',
 				data: data.map((entry) => entry.humidity),
 				borderColor: '#1A202C',
 				backgroundColor: 'rgba(26, 32, 44, 0.2)',

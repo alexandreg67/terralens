@@ -28,7 +28,7 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 					onKeyPress={onKeyPress}
 					placeholder="Enter city"
 					className="p-2 border rounded"
-					aria-label="Entrez le nom d'une ville pour obtenir les données météorologiques"
+					aria-label="Enter a city name to get weather data"
 				/>
 				<button
 					onClick={onSearchClick}
@@ -36,9 +36,9 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 					className={`ml-2 p-2 rounded ${
 						loading ? 'bg-gray-400' : 'bg-primary text-white'
 					} hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50`}
-					aria-label="Rechercher les données météorologiques pour la ville spécifiée"
+					aria-label="Search for weather data for the specified city"
 				>
-					{loading ? <Spinner /> : 'Rechercher'}
+					{loading ? <Spinner /> : 'Search'}
 				</button>
 			</div>
 

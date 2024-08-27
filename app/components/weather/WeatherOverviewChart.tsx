@@ -53,7 +53,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 		labels,
 		datasets: [
 			{
-				label: 'Température moyenne (°C)',
+				label: 'Average Temperature (°C)',
 				data: averageTemperature,
 				borderColor: '#2C7A7B',
 				backgroundColor: 'rgba(44, 122, 123, 0.2)',
@@ -61,7 +61,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 				tension: 0.3,
 			},
 			{
-				label: 'Vitesse moyenne du vent (m/s)',
+				label: 'Average Wind Speed (m/s)',
 				data: averageWindSpeed,
 				borderColor: '#E53E3E',
 				backgroundColor: 'rgba(229, 62, 62, 0.2)',
@@ -69,7 +69,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 				tension: 0.3,
 			},
 			{
-				label: 'Humidité moyenne (%)',
+				label: 'Average Humidity (%)',
 				data: averageHumidity,
 				borderColor: '#1A202C',
 				backgroundColor: 'rgba(26, 32, 44, 0.2)',

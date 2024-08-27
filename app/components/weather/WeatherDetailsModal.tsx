@@ -1,5 +1,5 @@
 import React from 'react';
-import WeatherModalContent from './WeatherModalContent'; // Assurez-vous que le chemin est correct
+import WeatherModalContent from './WeatherModalContent';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
 
 interface WeatherDetailsModalProps {
