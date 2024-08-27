@@ -20,14 +20,6 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
 }) => {
 	return (
 		<div>
-			{displayCity && (
-				<div className="text-center mb-8">
-					<h3 className="text-2xl font-semibold text-secondary">
-						{displayCity}
-					</h3>
-				</div>
-			)}
-
 			{loading ? (
 				<div className="flex justify-center items-center" aria-live="polite">
 					<Spinner />

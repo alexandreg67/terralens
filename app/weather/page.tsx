@@ -1,3 +1,4 @@
+// WeatherPage.tsx
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -5,6 +6,7 @@ import axios from 'axios';
 import WeatherDetailsModal from '../components/weather/WeatherDetailsModal';
 import WeatherSearchBar from '../components/weather/WeatherSearchBar';
 import WeatherDisplay from '../components/weather/WeatherDisplay';
+import WeatherOverviewChart from '../components/weather/WeatherOverviewChart';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
 
 const useInput = (initialValue: string) => {
@@ -30,7 +32,7 @@ const WeatherPage: React.FC = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [location, setLocation] = useState({
-		latitude: '48.8566', // Coordonnées pour Paris par défaut
+		latitude: '48.8566', // Default coordinates for Paris
 		longitude: '2.3522',
 		city: '',
 		displayCity: 'Paris',
@@ -53,7 +55,7 @@ const WeatherPage: React.FC = () => {
 				const data = await response.json();
 
 				if (!data.hourly || !data.hourly.time || !data.hourly.temperature_2m) {
-					throw new Error('Données horaires manquantes ou incorrectes');
+					throw new Error('Missing or incorrect hourly data');
 				}
 
 				const currentTime = new Date();
@@ -142,7 +144,7 @@ const WeatherPage: React.FC = () => {
 			} catch (error) {
 				console.error('Error fetching weather data:', error);
 				setWeatherData(null);
-				setError('Erreur lors de la récupération des données météorologiques.');
+				setError('Error retrieving weather data.');
 			} finally {
 				setLoading(false);
 			}
@@ -192,7 +194,7 @@ const WeatherPage: React.FC = () => {
 					}));
 				} else {
 					setWeatherData(null);
-					setError('Ville non trouvée.');
+					setError('City not found.');
 					setLocation((prev) => ({
 						...prev,
 						displayCity: '',
@@ -201,14 +203,22 @@ const WeatherPage: React.FC = () => {
 			} catch (error) {
 				console.error('Error fetching city coordinates:', error);
 				setWeatherData(null);
-				setError('Erreur réseau lors de la recherche de la ville.');
+				setError('Network error while searching for the city.');
 				setLocation((prev) => ({
 					...prev,
 					displayCity: '',
 				}));
 			}
 		} else {
-			setError('Veuillez entrer un nom de ville valide.');
+			setError('Please enter a valid city name.');
+		}
+	};
+
+	// Scroll to the chart
+	const scrollToChart = () => {
+		const chartElement = document.getElementById('weather-chart');
+		if (chartElement) {
+			chartElement.scrollIntoView({ behavior: 'smooth' });
 		}
 	};
 
@@ -230,6 +240,27 @@ const WeatherPage: React.FC = () => {
 				loading={loading}
 				error={error}
 			/>
+
+			{/* City name display */}
+			{location.displayCity && (
+				<div className="text-center mb-8">
+					<h3 className="text-2xl font-semibold text-secondary">
+						{location.displayCity}
+					</h3>
+
+					{/* Button to scroll to the chart */}
+					{weatherData && (
+						<div className="mt-4">
+							<button
+								onClick={scrollToChart}
+								className="text-primary font-semibold underline hover:no-underline"
+							>
+								See Weather Trends for {location.displayCity}
+							</button>
+						</div>
+					)}
+				</div>
+			)}
 
 			<WeatherDisplay
 				weatherData={weatherData}
@@ -253,6 +284,16 @@ const WeatherPage: React.FC = () => {
 					longitude: parseFloat(location.longitude),
 				}}
 			/>
+
+			{/* Chart with city name */}
+			{weatherData && (
+				<div id="weather-chart" className="mt-12">
+					<h3 className="text-2xl font-bold text-center mb-4 text-secondary">
+						Weather Trends in {location.displayCity}
+					</h3>
+					<WeatherOverviewChart weatherData={weatherData} />
+				</div>
+			)}
 		</div>
 	);
 };
