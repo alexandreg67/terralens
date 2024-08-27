@@ -1,15 +1,20 @@
 import React from 'react';
 
+interface CountryOption {
+	value: string;
+	label: string;
+}
+
 interface CountrySelectorProps {
-	selectedCountry: string;
+	selectedCountry: string | null;
 	onCountryChange: (countryCode: string) => void;
+	countries?: { code: string; name: string }[];
 }
 
 const CountrySelector: React.FC<CountrySelectorProps> = ({
 	selectedCountry,
 	onCountryChange,
-}) => {
-	const countries = [
+	countries = [
 		{ code: 'US', name: 'United States' },
 		{ code: 'FR', name: 'France' },
 		{ code: 'DE', name: 'Germany' },
@@ -30,7 +35,15 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		{ code: 'NG', name: 'Nigeria' },
 		{ code: 'AR', name: 'Argentina' },
 		{ code: 'SA', name: 'Saudi Arabia' },
-	];
+	],
+}) => {
+	const sortedCountries = countries.sort((a, b) =>
+		a.name.localeCompare(b.name)
+	);
+	const options: CountryOption[] = sortedCountries.map((country) => ({
+		value: country.code,
+		label: country.name,
+	}));
 
 	return (
 		<div className="mb-4">
@@ -42,13 +55,16 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 			</label>
 			<select
 				id="country-select"
-				value={selectedCountry}
+				value={selectedCountry || ''}
 				onChange={(e) => onCountryChange(e.target.value)}
-				className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-300"
+				className="mt-1 block w-full text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 			>
-				{countries.map((country) => (
-					<option key={country.code} value={country.code}>
-						{country.name}
+				<option value="" disabled>
+					Select a country
+				</option>
+				{options.map((option) => (
+					<option key={option.value} value={option.value}>
+						{option.label}
 					</option>
 				))}
 			</select>

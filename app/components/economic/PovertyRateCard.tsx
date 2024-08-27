@@ -1,58 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../../components/Spinner';
+import { getPovertyRate } from '../../services/EconomicService';
 
 const PovertyRateCard: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [povertyRate, setPovertyRate] = useState<number | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchPovertyRate = async () => {
+		const fetchData = async () => {
 			setLoading(true);
+			setError(null);
 			try {
-				const response = await fetch(
-					`https://api.worldbank.org/v2/country/${countryCode}/indicator/SI.POV.DDAY?format=json`
-				);
-				const data = await response.json();
-				console.log('Poverty Rate API Response:', data);
-
-				// Vérifier si les données sont présentes et trouver la dernière valeur valide
-				if (data && data[1] && Array.isArray(data[1])) {
-					const latestValidValue = data[1].find(
-						(entry: any) => entry.value !== null
-					);
-					if (latestValidValue) {
-						setPovertyRate(latestValidValue.value);
-					} else {
-						console.error('No valid data found for Poverty Rate:', data);
-						setPovertyRate(null);
-					}
-				} else {
-					console.error('Unexpected API response structure:', data);
-					setPovertyRate(null);
-				}
-			} catch (error) {
-				console.error('Error fetching poverty rate data:', error);
-				setPovertyRate(null);
+				const rate = await getPovertyRate(countryCode);
+				setPovertyRate(rate);
+			} catch (err) {
+				setError('Failed to fetch poverty rate data.');
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchPovertyRate();
+		fetchData();
 	}, [countryCode]);
+
+	let content: string | null = null;
+
+	if (loading) {
+		content = '';
+	} else if (error) {
+		content = error;
+	} else if (povertyRate !== null) {
+		content = `${povertyRate.toFixed(2)}%`;
+	} else {
+		content = 'No data available';
+	}
 
 	return (
 		<EconomicDataCard
 			title="Poverty Rate"
-			value={
-				loading
-					? 'Loading...'
-					: povertyRate !== null
-					? `${povertyRate.toFixed(2)}%`
-					: 'No data available'
-			}
+			value={content}
 			description="The percentage of the population living on less than $1.90 a day at 2011 international prices."
 		/>
 	);

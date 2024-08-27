@@ -1,52 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../../components/Spinner';
+import { getUnemploymentRate } from '../../services/EconomicService';
 
 const UnemploymentRateCard: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [unemploymentRate, setUnemploymentRate] = useState<number | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchUnemploymentRate = async () => {
+		const fetchData = async () => {
 			setLoading(true);
+			setError(null);
 			try {
-				const response = await fetch(
-					`https://api.worldbank.org/v2/country/${countryCode}/indicator/SL.UEM.TOTL.ZS?format=json`
-				);
-				const data = await response.json();
-				console.log('Unemployment Rate API Response:', data);
-
-				const latestValidValue = data[1].find(
-					(entry: any) => entry.value !== null
-				);
-				if (latestValidValue) {
-					setUnemploymentRate(latestValidValue.value);
-				} else {
-					console.error('No valid data found for Unemployment Rate:', data);
-					setUnemploymentRate(null);
-				}
-			} catch (error) {
-				console.error('Error fetching unemployment rate data:', error);
-				setUnemploymentRate(null);
+				const rate = await getUnemploymentRate(countryCode);
+				setUnemploymentRate(rate);
+			} catch (err) {
+				setError('Failed to fetch unemployment rate data.');
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchUnemploymentRate();
+		fetchData();
 	}, [countryCode]);
+
+	let content: string | null = null;
+
+	if (loading) {
+		content = 'Loading...';
+	} else if (error) {
+		content = `Error: ${error}`;
+	} else if (unemploymentRate !== null) {
+		content = `${unemploymentRate.toFixed(2)}%`;
+	} else {
+		content = 'No data available';
+	}
 
 	return (
 		<EconomicDataCard
 			title="Unemployment Rate"
-			value={
-				loading
-					? 'Loading...'
-					: unemploymentRate !== null
-					? `${unemploymentRate.toFixed(2)}%`
-					: 'No data available'
-			}
+			value={content}
 			description="The percentage of the labor force that is unemployed and actively seeking work."
 		/>
 	);

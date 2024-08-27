@@ -1,16 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import EconomicDataFetcher from '../components/economic/EconomicDataFetcher'; // Current GDP
-import CountrySelector from '../components/economic/CountrySelector';
+import dynamic from 'next/dynamic'; // Importer dynamic pour charger des composants dynamiquement
+
+import EconomicDataFetcher from '../components/economic/EconomicDataFetcher';
 import GDPGrowthRateCard from '../components/economic/GDPGrowthRateCard';
 import LifeExpectancyCard from '../components/economic/LifeExpectancyCard';
 import UnemploymentRateCard from '../components/economic/UnemploymentRateCard';
 import PovertyRateCard from '../components/economic/PovertyRateCard';
 import CO2EmissionsCard from '../components/economic/CO2EmissionsCard';
 
+// Charger CountrySelector dynamiquement avec SSR désactivé
+const CountrySelector = dynamic(
+	() => import('../components/economic/CountrySelector'),
+	{
+		ssr: false,
+	}
+);
+
 const EconomicPage: React.FC = () => {
-	const [selectedCountry, setSelectedCountry] = useState<string>('US'); // Définir un pays par défaut
+	const [selectedCountry, setSelectedCountry] = useState<string>('US');
 
 	const handleCountryChange = (countryCode: string) => {
 		setSelectedCountry(countryCode);
@@ -40,7 +49,7 @@ const EconomicPage: React.FC = () => {
 			</div>
 
 			{/* Current GDP */}
-			<div className="col-span-1 md:col-span-2 lg:col-span-4 h-full mb-6">
+			<div className="mb-6">
 				<EconomicDataFetcher countryCode={selectedCountry} />
 			</div>
 

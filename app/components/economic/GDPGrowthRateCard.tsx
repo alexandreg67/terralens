@@ -1,30 +1,48 @@
 import React, { useEffect, useState } from 'react';
+import { getGDPGrowthRate } from '../../services/EconomicService';
 import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../Spinner';
+import { formatPercentage } from '../../utils/formatting';
 
 const GDPGrowthRateCard: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [growthRate, setGrowthRate] = useState<number | null>(null);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchGrowthRate = async () => {
-			const response = await fetch(
-				`https://api.worldbank.org/v2/country/${countryCode}/indicator/NY.GDP.MKTP.KD.ZG?format=json`
-			);
-			const data = await response.json();
-			if (data && data[1]) {
-				setGrowthRate(data[1][0].value);
+		const fetchData = async () => {
+			setLoading(true);
+			setError(null);
+			try {
+				const rate = await getGDPGrowthRate(countryCode);
+				setGrowthRate(rate);
+			} catch (err) {
+				setError('Failed to fetch GDP growth rate.');
+			} finally {
+				setLoading(false);
 			}
 		};
 
-		fetchGrowthRate();
+		fetchData();
 	}, [countryCode]);
+
+	let content: string | number | null | React.ReactElement;
+
+	if (loading) {
+		content = <Spinner />;
+	} else if (error) {
+		content = <span className="text-red-500">{error}</span>;
+	} else {
+		content = formatPercentage(growthRate) as string;
+	}
 
 	return (
 		<EconomicDataCard
-			title="Annual GDP Growth Rate"
-			value={growthRate ? `${growthRate.toFixed(2)}%` : null}
-			description="The percentage change in the Gross Domestic Product (GDP) from one year to the next. This indicator measures the economic growth rate of a country."
+			title="GDP Growth Rate"
+			value={content as string | number | null}
+			description="The annual percentage growth rate of GDP at market prices based on constant local currency."
 		/>
 	);
 };

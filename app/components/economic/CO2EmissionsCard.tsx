@@ -1,46 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import EconomicDataCard from './EconomicDataCard';
+import { fetchEconomicData } from '../../api/economic/route';
 
-const CO2EmissionsCard: React.FC<{ countryCode: string }> = ({
-	countryCode,
-}) => {
-	const [co2Emissions, setCo2Emissions] = useState<number | null>(null);
+const useEconomicData = (countryCode: string, indicator: string) => {
+	const [data, setData] = useState<number | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		const fetchCo2Emissions = async () => {
+		const fetchData = async () => {
 			setLoading(true);
-			try {
-				const response = await fetch(
-					`https://api.worldbank.org/v2/country/${countryCode}/indicator/EN.ATM.CO2E.KT?format=json`
-				);
-				const data = await response.json();
-				console.log('CO2 Emissions API Response:', data);
+			setError(null);
 
-				if (data && data[1] && Array.isArray(data[1])) {
-					const latestValidValue = data[1].find(
-						(entry: any) => entry.value !== null
-					);
-					if (latestValidValue) {
-						setCo2Emissions(latestValidValue.value);
-					} else {
-						console.error('No valid data found for CO2 Emissions:', data);
-						setCo2Emissions(null);
-					}
+			try {
+				const result = await fetchEconomicData(countryCode, indicator);
+				const latestValidValue = result.find(
+					(entry: { value: null }) => entry.value !== null
+				);
+
+				if (latestValidValue) {
+					setData(latestValidValue.value);
 				} else {
-					console.error('Unexpected API response structure:', data);
-					setCo2Emissions(null);
+					console.error('No valid data found:', result);
+					setData(null);
 				}
-			} catch (error) {
-				console.error('Error fetching CO2 emissions data:', error);
-				setCo2Emissions(null);
+			} catch (err) {
+				console.error('Error fetching economic data:', err);
+				setError('Failed to load data');
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchCo2Emissions();
-	}, [countryCode]);
+		fetchData();
+	}, [countryCode, indicator]);
+
+	return { data, loading, error };
+};
+
+const CO2EmissionsCard: React.FC<{ countryCode: string }> = ({
+	countryCode,
+}) => {
+	const {
+		data: co2Emissions,
+		loading,
+		error,
+	} = useEconomicData(countryCode, 'EN.ATM.CO2E.KT');
 
 	return (
 		<EconomicDataCard
@@ -48,6 +53,8 @@ const CO2EmissionsCard: React.FC<{ countryCode: string }> = ({
 			value={
 				loading
 					? 'Loading...'
+					: error
+					? 'Error loading data'
 					: co2Emissions !== null
 					? `${co2Emissions.toLocaleString()} kt`
 					: 'No data available'
