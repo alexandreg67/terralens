@@ -2,20 +2,10 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import _ from 'lodash';
-import WeatherCard from '../components/weather/WeatherCard';
 import WeatherDetailsModal from '../components/weather/WeatherDetailsModal';
-import Spinner from '../components/Spinner'; // Assurez-vous que le chemin est correct
-
-interface WeatherDataEntry {
-	date: string;
-	hour: number;
-	time: string;
-	temperature: number;
-	windSpeed: number;
-	humidity: number;
-	condition: string; // Add the 'condition' property
-}
+import WeatherSearchBar from '../components/weather/WeatherSearchBar';
+import WeatherDisplay from '../components/weather/WeatherDisplay';
+import { WeatherDataEntry } from '@/app/types/weatherTypes';
 
 const useInput = (initialValue: string) => {
 	const [value, setValue] = useState(initialValue);
@@ -34,8 +24,8 @@ const WeatherPage: React.FC = () => {
 	const [allWeatherData, setAllWeatherData] = useState<Record<
 		string,
 		WeatherDataEntry[]
-	> | null>(null); // Stockage complet
-	const [selectedDay, setSelectedDay] = useState<string | null>(null);
+	> | null>(null);
+	const [selectedDay, setSelectedDay] = useState<string>(''); // Provide a default value of an empty string
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -73,23 +63,23 @@ const WeatherPage: React.FC = () => {
 					temperature: number,
 					humidity: number,
 					windSpeed: number
-				) => {
+				): string => {
 					if (temperature > 30 && humidity < 40) {
-						return 'Clear'; // Temps clair et chaud
+						return 'Clear';
 					} else if (temperature > 30 && humidity > 60) {
-						return 'Thunderstorm'; // Conditions propices aux orages
+						return 'Thunderstorm';
 					} else if (humidity > 85 && temperature < 20 && windSpeed < 5) {
-						return 'Fog'; // Brouillard ou conditions brumeuses
+						return 'Fog';
 					} else if (humidity > 70 && windSpeed > 15) {
-						return 'Rain'; // Pluie probable avec humidité élevée et vent
+						return 'Rain';
 					} else if (windSpeed > 20) {
-						return 'Windy'; // Très venteux
+						return 'Windy';
 					} else if (humidity > 70 && temperature > 20 && windSpeed < 10) {
-						return 'Partly Cloudy'; // Partiellement nuageux
+						return 'Partly Cloudy';
 					} else if (temperature < 0) {
-						return 'Snow'; // Neige possible si la température est très basse
+						return 'Snow';
 					} else {
-						return 'Cloudy'; // Nuageux par défaut
+						return 'Cloudy';
 					}
 				};
 
@@ -161,7 +151,6 @@ const WeatherPage: React.FC = () => {
 	);
 
 	useEffect(() => {
-		// Charger les données météo par défaut pour Paris au premier chargement
 		if (location.latitude && location.longitude) {
 			fetchWeatherData(location.latitude, location.longitude);
 		}
@@ -174,21 +163,11 @@ const WeatherPage: React.FC = () => {
 
 	const closeModal = () => {
 		setIsModalOpen(false);
-		setSelectedDay(null);
-	};
-
-	const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		cityInput.onChange(e);
-	};
-
-	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter') {
-			handleSearchClick();
-		}
+		setSelectedDay('');
 	};
 
 	const handleSearchClick = async () => {
-		setError(null); // Réinitialiser l'erreur avant la recherche
+		setError(null);
 		if (cityInput.value.trim().length > 2) {
 			try {
 				const geoResponse = await axios.get(
@@ -239,81 +218,40 @@ const WeatherPage: React.FC = () => {
 				Weather Data
 			</h2>
 
-			<div className="flex justify-center mb-8">
-				<input
-					type="text"
-					value={cityInput.value}
-					onChange={handleCityChange}
-					onKeyPress={handleKeyPress}
-					placeholder="Enter city"
-					className="p-2 border rounded"
-					aria-label="Entrez le nom d'une ville pour obtenir les données météorologiques"
-				/>
-				<button
-					onClick={handleSearchClick}
-					disabled={loading}
-					className={`ml-2 p-2 rounded ${
-						loading ? 'bg-gray-400' : 'bg-primary text-white'
-					} hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50`}
-					aria-label="Rechercher les données météorologiques pour la ville spécifiée"
-				>
-					{loading ? <Spinner /> : 'Rechercher'}
-				</button>
-			</div>
+			<WeatherSearchBar
+				cityInputValue={cityInput.value}
+				onCityChange={cityInput.onChange}
+				onSearchClick={handleSearchClick}
+				onKeyPress={(e) => {
+					if (e.key === 'Enter') {
+						handleSearchClick();
+					}
+				}}
+				loading={loading}
+				error={error}
+			/>
 
-			{error && (
-				<div className="text-center mb-8">
-					<p className="text-xl text-accent" role="alert">
-						{error}
-					</p>
-				</div>
-			)}
-
-			{location.displayCity && (
-				<div className="text-center mb-8">
-					<h3 className="text-2xl font-semibold text-secondary">
-						{location.displayCity}
-					</h3>
-				</div>
-			)}
-
-			{loading ? (
-				<div className="flex justify-center items-center" aria-live="polite">
-					<Spinner />
-				</div>
-			) : weatherData ? (
-				<div
-					className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-500 ${
-						loading ? 'opacity-0' : 'opacity-100'
-					}`}
-				>
-					{Object.entries(weatherData).map(([date, temps]) => (
-						<WeatherCard
-							key={date}
-							date={date}
-							data={temps.slice(0, 3)} // Montre seulement les 3 premières heures futures dans la carte
-							onOpenModal={openModal}
-						/>
-					))}
-				</div>
-			) : (
-				!error && (
-					<p className="text-center text-xl text-error">
-						Aucune donnée disponible
-					</p>
-				)
-			)}
+			<WeatherDisplay
+				weatherData={weatherData}
+				onOpenModal={openModal}
+				loading={loading}
+				error={error}
+				displayCity={location.displayCity}
+			/>
 
 			<WeatherDetailsModal
 				date={selectedDay}
 				data={
-					selectedDay && allWeatherData?.[selectedDay] // Utiliser toutes les données pour la modale
+					selectedDay && allWeatherData?.[selectedDay]
 						? allWeatherData[selectedDay]
-						: null
+						: []
 				}
 				isOpen={isModalOpen}
 				onClose={closeModal}
-				aria-modal="true"
+				city={{
+					latitude: parseFloat(location.latitude),
+					longitude: parseFloat(location.longitude),
+				}}
 			/>
 		</div>
 	);

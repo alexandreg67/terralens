@@ -1,17 +1,16 @@
 import React from 'react';
+import WeatherModalContent from './WeatherModalContent'; // Assurez-vous que le chemin est correct
+import { WeatherDataEntry } from '@/app/types/weatherTypes';
 
 interface WeatherDetailsModalProps {
-	date: string | null;
-	data:
-		| {
-				time: string;
-				temperature: number;
-				windSpeed: number;
-				humidity: number;
-		  }[]
-		| null;
+	date: string;
+	data: WeatherDataEntry[];
 	isOpen: boolean;
 	onClose: () => void;
+	city: {
+		latitude: number;
+		longitude: number;
+	};
 }
 
 const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
@@ -19,6 +18,7 @@ const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
 	data,
 	isOpen,
 	onClose,
+	city,
 }) => {
 	if (!isOpen || !date || !data) return null;
 
@@ -28,20 +28,8 @@ const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
 				isOpen ? 'opacity-100' : 'opacity-0'
 			}`}
 		>
-			<div className="bg-white p-8 rounded-lg shadow-md max-w-lg w-full max-h-full overflow-y-auto">
-				<h3 className="text-2xl font-semibold mb-4 text-center text-primary">
-					{date}
-				</h3>
-				<div className="space-y-2">
-					{data.map((temp, index) => (
-						<div key={index} className="flex justify-between text-lg">
-							<span>{temp.time}</span>
-							<span>{temp.temperature}°C</span>
-							<span>{temp.windSpeed} m/s</span>
-							<span>{temp.humidity}%</span>
-						</div>
-					))}
-				</div>
+			<div className="bg-white p-8 rounded-lg shadow-md max-w-xl w-full max-h-full overflow-y-auto">
+				<WeatherModalContent city={city} data={data} date={date} />
 				<button
 					onClick={onClose}
 					className="mt-6 w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dark"
