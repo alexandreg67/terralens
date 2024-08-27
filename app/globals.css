@@ -21,18 +21,18 @@ body {
   width: 40px !important;
   height: 40px !important;
   z-index: 2 !important;
-  color: #2c7a7b !important; /* Couleur primaire définie dans ton thème */
+  color: #2c7a7b !important; /* Couleur primaire définie dans le thème */
 }
 
 .slick-prev:before,
 .slick-next:before {
   font-size: 40px !important;
-  color: #2c7a7b !important; /* Couleur primaire définie dans ton thème */
+  color: #2c7a7b !important; /* Couleur primaire définie dans le thème */
 }
 
 .slick-prev:hover:before,
 .slick-next:hover:before {
-  color: #e53e3e !important; /* Couleur accent définie dans ton thème */
+  color: #e53e3e !important; /* Couleur accent définie dans le thème */
 }
 
 .slick-prev {

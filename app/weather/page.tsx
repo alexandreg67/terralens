@@ -5,6 +5,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import WeatherCard from '../components/weather/WeatherCard';
 import WeatherDetailsModal from '../components/weather/WeatherDetailsModal';
+import Spinner from '../components/Spinner'; // Assurez-vous que le chemin est correct
 
 interface WeatherDataEntry {
 	date: string;
@@ -13,6 +14,7 @@ interface WeatherDataEntry {
 	temperature: number;
 	windSpeed: number;
 	humidity: number;
+	condition: string; // Add the 'condition' property
 }
 
 const useInput = (initialValue: string) => {
@@ -36,6 +38,7 @@ const WeatherPage: React.FC = () => {
 	const [selectedDay, setSelectedDay] = useState<string | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 	const [location, setLocation] = useState({
 		latitude: '48.8566', // Coordonnées pour Paris par défaut
 		longitude: '2.3522',
@@ -46,6 +49,8 @@ const WeatherPage: React.FC = () => {
 	const fetchWeatherData = useCallback(
 		async (latitude: string, longitude: string) => {
 			setLoading(true);
+			setError(null);
+
 			const params = {
 				latitude,
 				longitude,
@@ -64,10 +69,41 @@ const WeatherPage: React.FC = () => {
 				const currentTime = new Date();
 				const currentHour = currentTime.getHours();
 
+				const deriveCondition = (
+					temperature: number,
+					humidity: number,
+					windSpeed: number
+				) => {
+					if (temperature > 30 && humidity < 40) {
+						return 'Clear'; // Temps clair et chaud
+					} else if (temperature > 30 && humidity > 60) {
+						return 'Thunderstorm'; // Conditions propices aux orages
+					} else if (humidity > 85 && temperature < 20 && windSpeed < 5) {
+						return 'Fog'; // Brouillard ou conditions brumeuses
+					} else if (humidity > 70 && windSpeed > 15) {
+						return 'Rain'; // Pluie probable avec humidité élevée et vent
+					} else if (windSpeed > 20) {
+						return 'Windy'; // Très venteux
+					} else if (humidity > 70 && temperature > 20 && windSpeed < 10) {
+						return 'Partly Cloudy'; // Partiellement nuageux
+					} else if (temperature < 0) {
+						return 'Snow'; // Neige possible si la température est très basse
+					} else {
+						return 'Cloudy'; // Nuageux par défaut
+					}
+				};
+
 				const allData = data.hourly.time.map(
 					(time: string, index: number): WeatherDataEntry => {
 						const dateTime = new Date(time);
 						const hour = dateTime.getHours();
+
+						const condition = deriveCondition(
+							data.hourly.temperature_2m[index],
+							data.hourly.relative_humidity_2m[index],
+							data.hourly.wind_speed_10m[index]
+						);
+
 						return {
 							date: dateTime.toLocaleDateString(),
 							hour,
@@ -78,11 +114,11 @@ const WeatherPage: React.FC = () => {
 							temperature: data.hourly.temperature_2m[index],
 							windSpeed: data.hourly.wind_speed_10m[index],
 							humidity: data.hourly.relative_humidity_2m[index],
+							condition: condition,
 						};
 					}
 				);
 
-				// Filtrer uniquement les heures futures pour les cartes
 				const filteredData = allData.filter(
 					(entry: WeatherDataEntry) => entry.hour >= currentHour
 				);
@@ -111,11 +147,12 @@ const WeatherPage: React.FC = () => {
 					{}
 				);
 
-				setWeatherData(groupedFilteredData); // Pour les cartes
-				setAllWeatherData(groupedAllData); // Stockage complet pour la modale
+				setWeatherData(groupedFilteredData);
+				setAllWeatherData(groupedAllData);
 			} catch (error) {
 				console.error('Error fetching weather data:', error);
 				setWeatherData(null);
+				setError('Erreur lors de la récupération des données météorologiques.');
 			} finally {
 				setLoading(false);
 			}
@@ -124,6 +161,7 @@ const WeatherPage: React.FC = () => {
 	);
 
 	useEffect(() => {
+		// Charger les données météo par défaut pour Paris au premier chargement
 		if (location.latitude && location.longitude) {
 			fetchWeatherData(location.latitude, location.longitude);
 		}
@@ -139,10 +177,19 @@ const WeatherPage: React.FC = () => {
 		setSelectedDay(null);
 	};
 
-	const handleCityChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		cityInput.onChange(e);
+	};
 
-		if (cityInput.value.length > 2) {
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			handleSearchClick();
+		}
+	};
+
+	const handleSearchClick = async () => {
+		setError(null); // Réinitialiser l'erreur avant la recherche
+		if (cityInput.value.trim().length > 2) {
 			try {
 				const geoResponse = await axios.get(
 					`https://nominatim.openstreetmap.org/search`,
@@ -164,10 +211,25 @@ const WeatherPage: React.FC = () => {
 						longitude: lon,
 						displayCity: display_name,
 					}));
+				} else {
+					setWeatherData(null);
+					setError('Ville non trouvée.');
+					setLocation((prev) => ({
+						...prev,
+						displayCity: '',
+					}));
 				}
 			} catch (error) {
 				console.error('Error fetching city coordinates:', error);
+				setWeatherData(null);
+				setError('Erreur réseau lors de la recherche de la ville.');
+				setLocation((prev) => ({
+					...prev,
+					displayCity: '',
+				}));
 			}
+		} else {
+			setError('Veuillez entrer un nom de ville valide.');
 		}
 	};
 
@@ -182,10 +244,30 @@ const WeatherPage: React.FC = () => {
 					type="text"
 					value={cityInput.value}
 					onChange={handleCityChange}
+					onKeyPress={handleKeyPress}
 					placeholder="Enter city"
 					className="p-2 border rounded"
+					aria-label="Entrez le nom d'une ville pour obtenir les données météorologiques"
 				/>
+				<button
+					onClick={handleSearchClick}
+					disabled={loading}
+					className={`ml-2 p-2 rounded ${
+						loading ? 'bg-gray-400' : 'bg-primary text-white'
+					} hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50`}
+					aria-label="Rechercher les données météorologiques pour la ville spécifiée"
+				>
+					{loading ? <Spinner /> : 'Rechercher'}
+				</button>
 			</div>
+
+			{error && (
+				<div className="text-center mb-8">
+					<p className="text-xl text-accent" role="alert">
+						{error}
+					</p>
+				</div>
+			)}
 
 			{location.displayCity && (
 				<div className="text-center mb-8">
@@ -196,9 +278,15 @@ const WeatherPage: React.FC = () => {
 			)}
 
 			{loading ? (
-				<p className="text-center text-xl">Loading...</p>
+				<div className="flex justify-center items-center" aria-live="polite">
+					<Spinner />
+				</div>
 			) : weatherData ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+				<div
+					className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-500 ${
+						loading ? 'opacity-0' : 'opacity-100'
+					}`}
+				>
 					{Object.entries(weatherData).map(([date, temps]) => (
 						<WeatherCard
 							key={date}
@@ -209,7 +297,11 @@ const WeatherPage: React.FC = () => {
 					))}
 				</div>
 			) : (
-				<p className="text-center text-xl text-error">Error fetching data</p>
+				!error && (
+					<p className="text-center text-xl text-error">
+						Aucune donnée disponible
+					</p>
+				)
 			)}
 
 			<WeatherDetailsModal
@@ -221,6 +313,7 @@ const WeatherPage: React.FC = () => {
 				}
 				isOpen={isModalOpen}
 				onClose={closeModal}
+				aria-modal="true"
 			/>
 		</div>
 	);

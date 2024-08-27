@@ -1,5 +1,40 @@
 import React from 'react';
-import { FaClock, FaThermometerHalf, FaWind, FaTint } from 'react-icons/fa';
+import {
+	FaClock,
+	FaThermometerHalf,
+	FaWind,
+	FaTint,
+	FaSun,
+	FaCloud,
+	FaCloudRain,
+	FaBolt,
+	FaSnowflake,
+	FaSmog,
+	FaCloudSun,
+} from 'react-icons/fa';
+
+const getWeatherIcon = (condition: string) => {
+	switch (condition) {
+		case 'Clear':
+			return <FaSun className="text-yellow-500" />;
+		case 'Cloudy':
+			return <FaCloud className="text-gray-500" />;
+		case 'Rain':
+			return <FaCloudRain className="text-blue-500" />;
+		case 'Thunderstorm':
+			return <FaBolt className="text-yellow-600" />;
+		case 'Windy':
+			return <FaWind className="text-gray-500" />;
+		case 'Fog':
+			return <FaSmog className="text-gray-400" />;
+		case 'Partly Cloudy':
+			return <FaCloudSun className="text-yellow-400" />;
+		case 'Snow':
+			return <FaSnowflake className="text-blue-400" />;
+		default:
+			return <FaCloud className="text-gray-500" />; // Icône par défaut
+	}
+};
 
 interface WeatherCardProps {
 	date: string;
@@ -8,6 +43,7 @@ interface WeatherCardProps {
 		temperature: number;
 		windSpeed: number;
 		humidity: number;
+		condition: string; // La condition météo ajoutée
 	}[];
 	onOpenModal: (date: string) => void;
 }
@@ -29,7 +65,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
 						className="flex justify-between items-center text-lg"
 					>
 						<span className="flex items-center space-x-2">
-							<FaClock className="text-blue-500" />
+							{getWeatherIcon(temp.condition)} {/* Affiche l'icône météo */}
 							<span>{temp.time}</span>
 						</span>
 						<span className="flex items-center space-x-2">
