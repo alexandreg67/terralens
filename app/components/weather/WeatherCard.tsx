@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
-	FaClock,
 	FaThermometerHalf,
 	FaWind,
 	FaTint,
@@ -16,23 +15,30 @@ import {
 const getWeatherIcon = (condition: string) => {
 	switch (condition) {
 		case 'Clear':
-			return <FaSun className="text-yellow-500" />;
+			return <FaSun className="text-yellow-500" aria-label="Clear" />;
 		case 'Cloudy':
-			return <FaCloud className="text-gray-500" />;
+			return <FaCloud className="text-gray-500" aria-label="Cloudy" />;
 		case 'Rain':
-			return <FaCloudRain className="text-blue-500" />;
+			return <FaCloudRain className="text-blue-500" aria-label="Rain" />;
 		case 'Thunderstorm':
-			return <FaBolt className="text-yellow-600" />;
+			return <FaBolt className="text-yellow-600" aria-label="Thunderstorm" />;
 		case 'Windy':
-			return <FaWind className="text-gray-500" />;
+			return <FaWind className="text-gray-500" aria-label="Windy" />;
 		case 'Fog':
-			return <FaSmog className="text-gray-400" />;
+			return <FaSmog className="text-gray-400" aria-label="Fog" />;
 		case 'Partly Cloudy':
-			return <FaCloudSun className="text-yellow-400" />;
+			return (
+				<FaCloudSun className="text-yellow-400" aria-label="Partly Cloudy" />
+			);
 		case 'Snow':
-			return <FaSnowflake className="text-blue-400" />;
+			return <FaSnowflake className="text-blue-400" aria-label="Snow" />;
 		default:
-			return <FaCloud className="text-gray-500" />; // Icône par défaut
+			return (
+				<FaCloud
+					className="text-gray-500"
+					aria-label="Unknown Weather Condition"
+				/>
+			);
 	}
 };
 
@@ -43,7 +49,7 @@ interface WeatherCardProps {
 		temperature: number;
 		windSpeed: number;
 		humidity: number;
-		condition: string; // La condition météo ajoutée
+		condition: string;
 	}[];
 	onOpenModal: (date: string) => void;
 }
@@ -53,31 +59,41 @@ const WeatherCard: React.FC<WeatherCardProps> = ({
 	data,
 	onOpenModal,
 }) => {
+	const weatherDataWithIcons = useMemo(() => {
+		return data.map((temp) => ({
+			...temp,
+			icon: getWeatherIcon(temp.condition),
+		}));
+	}, [data]);
+
 	return (
 		<div className="card bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
 			<h3 className="text-2xl font-semibold mb-4 text-center text-primary">
 				{date}
 			</h3>
 			<div className="space-y-2">
-				{data.map((temp, index) => (
+				{weatherDataWithIcons.map((temp, index) => (
 					<div
 						key={index}
 						className="flex justify-between items-center text-lg"
 					>
 						<span className="flex items-center space-x-2">
-							{getWeatherIcon(temp.condition)} {/* Affiche l'icône météo */}
+							{temp.icon} {/* Affiche l'icône météo */}
 							<span>{temp.time}</span>
 						</span>
 						<span className="flex items-center space-x-2">
-							<FaThermometerHalf className="text-red-500" />
+							<FaThermometerHalf
+								className="text-red-500"
+								aria-label="Temperature"
+							/>
 							<span>{temp.temperature}°C</span>
 						</span>
 						<span className="flex items-center space-x-2">
-							<FaWind className="text-green-500" />
+							<FaWind className="text-green-500" aria-label="Wind speed" />
 							<span>{temp.windSpeed} m/s</span>
 						</span>
 						<span className="flex items-center space-x-2">
-							<FaTint className="text-teal-500" />
+							<FaTint className="text-teal-500" aria-label="Humidity" />
 							<span>{temp.humidity}%</span>
 						</span>
 					</div>

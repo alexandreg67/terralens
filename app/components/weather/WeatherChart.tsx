@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
 	Chart as ChartJS,
@@ -9,10 +9,9 @@ import {
 	Title,
 	Tooltip,
 	Legend,
-	Filler, // Import du plugin Filler
+	Filler,
 } from 'chart.js';
 
-// Enregistrez le plugin Filler avec Chart.js
 ChartJS.register(
 	CategoryScale,
 	LinearScale,
@@ -21,39 +20,49 @@ ChartJS.register(
 	Title,
 	Tooltip,
 	Legend,
-	Filler // Enregistrement du plugin Filler
+	Filler
 );
 
-const WeatherChart = ({ data }: { data: any[] }) => {
-	const chartData = {
-		labels: data.map((entry) => entry.time),
-		datasets: [
-			{
-				label: 'Temperature (°C)',
-				data: data.map((entry) => entry.temperature),
-				borderColor: '#2C7A7B',
-				backgroundColor: 'rgba(44, 122, 123, 0.2)',
-				fill: true, // Activer le remplissage
-				tension: 0.3,
-			},
-			{
-				label: 'Wind Speed (m/s)',
-				data: data.map((entry) => entry.windSpeed),
-				borderColor: '#E53E3E',
-				backgroundColor: 'rgba(229, 62, 62, 0.2)',
-				fill: true, // Activer le remplissage
-				tension: 0.3,
-			},
-			{
-				label: 'Humidity (%)',
-				data: data.map((entry) => entry.humidity),
-				borderColor: '#1A202C',
-				backgroundColor: 'rgba(26, 32, 44, 0.2)',
-				fill: true, // Activer le remplissage
-				tension: 0.3,
-			},
-		],
-	};
+interface WeatherDataEntry {
+	time: string;
+	temperature: number;
+	windSpeed: number;
+	humidity: number;
+}
+
+const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
+	const chartData = useMemo(
+		() => ({
+			labels: data.map((entry) => entry.time),
+			datasets: [
+				{
+					label: 'Temperature (°C)',
+					data: data.map((entry) => entry.temperature),
+					borderColor: '#2C7A7B',
+					backgroundColor: 'rgba(44, 122, 123, 0.2)',
+					fill: true,
+					tension: 0.3,
+				},
+				{
+					label: 'Wind Speed (m/s)',
+					data: data.map((entry) => entry.windSpeed),
+					borderColor: '#E53E3E',
+					backgroundColor: 'rgba(229, 62, 62, 0.2)',
+					fill: true,
+					tension: 0.3,
+				},
+				{
+					label: 'Humidity (%)',
+					data: data.map((entry) => entry.humidity),
+					borderColor: '#1A202C',
+					backgroundColor: 'rgba(26, 32, 44, 0.2)',
+					fill: true,
+					tension: 0.3,
+				},
+			],
+		}),
+		[data]
+	);
 
 	const options = {
 		responsive: true,
@@ -93,7 +102,11 @@ const WeatherChart = ({ data }: { data: any[] }) => {
 	};
 
 	return (
-		<div className="w-full h-64 md:h-96">
+		<div
+			className="w-full h-64 md:h-96"
+			role="img"
+			aria-label="Weather data chart showing temperature, wind speed, and humidity over time"
+		>
 			<Line data={chartData} options={options} />
 		</div>
 	);

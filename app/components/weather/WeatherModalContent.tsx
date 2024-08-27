@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import WeatherChart from './WeatherChart'; // Assurez-vous que le chemin est correct
+import WeatherChart from './WeatherChart';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
 
 interface WeatherModalContentProps {
@@ -11,18 +11,11 @@ interface WeatherModalContentProps {
 	date: string;
 }
 
-const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
-	city,
-	data,
-	date,
-}) => {
-	const [sunrise, setSunrise] = useState('');
-	const [sunset, setSunset] = useState('');
+const useSunriseSunset = (latitude: number, longitude: number) => {
+	const [times, setTimes] = useState({ sunrise: '', sunset: '' });
 
 	useEffect(() => {
-		if (!city) return;
-
-		const fetchSunriseSunset = async (latitude: number, longitude: number) => {
+		const fetchSunriseSunset = async () => {
 			try {
 				const response = await fetch(
 					`https://api.sunrise-sunset.org/json?lat=${latitude}&lng=${longitude}&formatted=0`
@@ -30,18 +23,16 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 				const result = await response.json();
 
 				if (result.status === 'OK') {
-					setSunrise(
-						new Date(result.results.sunrise).toLocaleTimeString([], {
+					setTimes({
+						sunrise: new Date(result.results.sunrise).toLocaleTimeString([], {
 							hour: '2-digit',
 							minute: '2-digit',
-						})
-					);
-					setSunset(
-						new Date(result.results.sunset).toLocaleTimeString([], {
+						}),
+						sunset: new Date(result.results.sunset).toLocaleTimeString([], {
 							hour: '2-digit',
 							minute: '2-digit',
-						})
-					);
+						}),
+					});
 				} else {
 					throw new Error('API did not return valid data');
 				}
@@ -69,22 +60,30 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 				baseSunset.getTime() - minutesChange * 60 * 1000
 			);
 
-			setSunrise(
-				simulatedSunrise.toLocaleTimeString([], {
+			setTimes({
+				sunrise: simulatedSunrise.toLocaleTimeString([], {
 					hour: '2-digit',
 					minute: '2-digit',
-				})
-			);
-			setSunset(
-				simulatedSunset.toLocaleTimeString([], {
+				}),
+				sunset: simulatedSunset.toLocaleTimeString([], {
 					hour: '2-digit',
 					minute: '2-digit',
-				})
-			);
+				}),
+			});
 		};
 
-		fetchSunriseSunset(city.latitude, city.longitude);
-	}, [city]);
+		fetchSunriseSunset();
+	}, [latitude, longitude]);
+
+	return times;
+};
+
+const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
+	city,
+	data,
+	date,
+}) => {
+	const { sunrise, sunset } = useSunriseSunset(city.latitude, city.longitude);
 
 	const maxTemp = Math.max(...data.map((d) => d.temperature));
 	const minTemp = Math.min(...data.map((d) => d.temperature));

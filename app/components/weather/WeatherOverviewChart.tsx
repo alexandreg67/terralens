@@ -1,5 +1,4 @@
-// WeatherOverviewChart.tsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
 	Chart as ChartJS,
@@ -32,22 +31,27 @@ interface WeatherOverviewChartProps {
 const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 	weatherData,
 }) => {
-	const labels = Object.keys(weatherData);
-	const averageTemperature = labels.map(
-		(date) =>
-			weatherData[date].reduce((sum, entry) => sum + entry.temperature, 0) /
-			weatherData[date].length
-	);
-	const averageWindSpeed = labels.map(
-		(date) =>
-			weatherData[date].reduce((sum, entry) => sum + entry.windSpeed, 0) /
-			weatherData[date].length
-	);
-	const averageHumidity = labels.map(
-		(date) =>
-			weatherData[date].reduce((sum, entry) => sum + entry.humidity, 0) /
-			weatherData[date].length
-	);
+	// Utilisation de useMemo pour optimiser les calculs des moyennes
+	const { labels, averageTemperature, averageWindSpeed, averageHumidity } =
+		useMemo(() => {
+			const labels = Object.keys(weatherData);
+			const averageTemperature = labels.map(
+				(date) =>
+					weatherData[date].reduce((sum, entry) => sum + entry.temperature, 0) /
+					weatherData[date].length
+			);
+			const averageWindSpeed = labels.map(
+				(date) =>
+					weatherData[date].reduce((sum, entry) => sum + entry.windSpeed, 0) /
+					weatherData[date].length
+			);
+			const averageHumidity = labels.map(
+				(date) =>
+					weatherData[date].reduce((sum, entry) => sum + entry.humidity, 0) /
+					weatherData[date].length
+			);
+			return { labels, averageTemperature, averageWindSpeed, averageHumidity };
+		}, [weatherData]);
 
 	const chartData = {
 		labels,
@@ -117,7 +121,11 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 	};
 
 	return (
-		<div className="w-full h-64 md:h-96 mb-8">
+		<div
+			className="w-full h-64 md:h-96 mb-8"
+			role="img"
+			aria-label="Weather overview chart showing average temperature, wind speed, and humidity over time"
+		>
 			<Line data={chartData} options={options} />
 		</div>
 	);

@@ -19,6 +19,7 @@ const CityHeader: React.FC<CityHeaderProps> = ({
 				<div className="mt-4">
 					<button
 						onClick={onScrollToChart}
+						aria-label={`See weather trends for ${city}`}
 						className="text-primary font-semibold underline hover:no-underline"
 					>
 						See Weather Trends for {city}

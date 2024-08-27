@@ -1,22 +1,29 @@
-// utils/deriveCondition.ts
 export const deriveCondition = (
 	temperature: number,
 	humidity: number,
 	windSpeed: number
 ): string => {
-	if (temperature > 30 && humidity < 40) {
+	// Conditions d'interprétation des données météorologiques
+	const isHot = temperature > 30;
+	const isHumid = humidity > 60;
+	const isDry = humidity < 40;
+	const isCold = temperature < 0;
+	const isWindy = windSpeed > 20;
+	const isFoggy = humidity > 85 && temperature < 20 && windSpeed < 5;
+
+	if (isHot && isDry) {
 		return 'Clear';
-	} else if (temperature > 30 && humidity > 60) {
+	} else if (isHot && isHumid) {
 		return 'Thunderstorm';
-	} else if (humidity > 85 && temperature < 20 && windSpeed < 5) {
+	} else if (isFoggy) {
 		return 'Fog';
 	} else if (humidity > 70 && windSpeed > 15) {
 		return 'Rain';
-	} else if (windSpeed > 20) {
+	} else if (isWindy) {
 		return 'Windy';
 	} else if (humidity > 70 && temperature > 20 && windSpeed < 10) {
 		return 'Partly Cloudy';
-	} else if (temperature < 0) {
+	} else if (isCold) {
 		return 'Snow';
 	} else {
 		return 'Cloudy';

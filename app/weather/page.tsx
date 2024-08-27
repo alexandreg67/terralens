@@ -1,4 +1,3 @@
-// WeatherPage.tsx
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -29,12 +28,12 @@ const WeatherPage: React.FC = () => {
 		string,
 		WeatherDataEntry[]
 	> | null>(null);
-	const [selectedDay, setSelectedDay] = useState<string>(''); // Provide a default value of an empty string
+	const [selectedDay, setSelectedDay] = useState<string>('');
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [location, setLocation] = useState({
-		latitude: '48.8566', // Default coordinates for Paris
+		latitude: '48.8566',
 		longitude: '2.3522',
 		city: '',
 		displayCity: 'Paris',
@@ -125,13 +124,18 @@ const WeatherPage: React.FC = () => {
 		}
 	};
 
-	// Scroll to the chart
-	const scrollToChart = () => {
+	const scrollToChart = useCallback(() => {
 		const chartElement = document.getElementById('weather-chart');
 		if (chartElement) {
 			chartElement.scrollIntoView({ behavior: 'smooth' });
 		}
-	};
+	}, [weatherData]);
+
+	useEffect(() => {
+		if (weatherData) {
+			scrollToChart();
+		}
+	}, [weatherData, scrollToChart]);
 
 	return (
 		<div className="p-8 bg-background min-h-screen">

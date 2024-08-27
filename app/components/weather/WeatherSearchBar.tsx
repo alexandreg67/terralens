@@ -1,5 +1,5 @@
 import React from 'react';
-import Spinner from '../../components/Spinner'; // Assurez-vous que le chemin est correct
+import Spinner from '../../components/Spinner';
 
 interface WeatherSearchBarProps {
 	cityInputValue: string;
@@ -18,6 +18,16 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 	loading,
 	error,
 }) => {
+	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			onSearchClick();
+		}
+	};
+
+	const buttonClasses = loading
+		? 'bg-gray-400'
+		: 'bg-primary text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50';
+
 	return (
 		<div>
 			<div className="flex justify-center mb-8">
@@ -25,7 +35,7 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 					type="text"
 					value={cityInputValue}
 					onChange={onCityChange}
-					onKeyPress={onKeyPress}
+					onKeyPress={handleKeyPress}
 					placeholder="Enter city"
 					className="p-2 border rounded"
 					aria-label="Enter a city name to get weather data"
@@ -33,10 +43,9 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 				<button
 					onClick={onSearchClick}
 					disabled={loading}
-					className={`ml-2 p-2 rounded ${
-						loading ? 'bg-gray-400' : 'bg-primary text-white'
-					} hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50`}
+					className={`ml-2 p-2 rounded ${buttonClasses}`}
 					aria-label="Search for weather data for the specified city"
+					role="button"
 				>
 					{loading ? <Spinner /> : 'Search'}
 				</button>

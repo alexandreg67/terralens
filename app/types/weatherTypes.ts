@@ -1,14 +1,4 @@
 export interface WeatherDataEntry {
-	date: string;
-	hour: number;
-	time: string;
-	temperature: number;
-	windSpeed: number;
-	humidity: number;
-	condition: string;
-}
-
-export interface WeatherDataEntry {
 	date: string; // Date du relevé météo, au format string
 	hour: number; // Heure du relevé, au format number
 	time: string; // Heure du relevé, au format string
