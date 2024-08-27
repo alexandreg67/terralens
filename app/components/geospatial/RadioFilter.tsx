@@ -19,7 +19,7 @@ const RadioFilter: React.FC<RadioFilterProps> = ({
 	];
 
 	return (
-		<div className="flex justify-center space-x-4 my-4">
+		<div className="flex justify-center space-x-4 my-8">
 			{options.map((option) => (
 				<label key={option.value} className="inline-flex items-center">
 					<input

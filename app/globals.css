@@ -15,3 +15,30 @@ body {
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.slick-prev,
+.slick-next {
+  width: 40px !important;
+  height: 40px !important;
+  z-index: 2 !important;
+  color: #2c7a7b !important; /* Couleur primaire définie dans ton thème */
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 40px !important;
+  color: #2c7a7b !important; /* Couleur primaire définie dans ton thème */
+}
+
+.slick-prev:hover:before,
+.slick-next:hover:before {
+  color: #e53e3e !important; /* Couleur accent définie dans ton thème */
+}
+
+.slick-prev {
+  left: -50px !important; /* Ajuste la position pour que les flèches soient bien visibles */
+}
+
+.slick-next {
+  right: -50px !important; /* Ajuste la position pour que les flèches soient bien visibles */
+}

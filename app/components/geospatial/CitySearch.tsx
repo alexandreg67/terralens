@@ -16,33 +16,6 @@ interface CitySearchProps {
 	onCitySelect: (lat: number, lon: number) => void;
 }
 
-// Composant pour les flèches personnalisées
-const CustomArrow = ({
-	onClick,
-	direction,
-}: {
-	onClick?: () => void;
-	direction: 'left' | 'right';
-}) => (
-	<button
-		className={`btn btn-primary`}
-		onClick={onClick}
-		aria-label={`Slide ${direction}`}
-		style={{
-			width: '40px',
-			height: '40px',
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			fontSize: '20px',
-			lineHeight: '1',
-			margin: '0 10px',
-		}}
-	>
-		{direction === 'left' ? '<' : '>'}
-	</button>
-);
-
 const popularCities: City[] = [
 	{
 		name: 'Paris, France',
@@ -154,6 +127,7 @@ const popularCities: City[] = [
 const CitySearch: React.FC<CitySearchProps> = ({ onCitySelect }) => {
 	const [query, setQuery] = useState<string>('');
 	const [results, setResults] = useState<City[]>([]);
+	const [selectedCity, setSelectedCity] = useState<string>('');
 
 	const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value);
@@ -179,6 +153,10 @@ const CitySearch: React.FC<CitySearchProps> = ({ onCitySelect }) => {
 		onCitySelect(lat, lon);
 		setQuery('');
 		setResults([]);
+		const selectedCityName =
+			popularCities.find((city) => city.lat === lat && city.lon === lon)
+				?.name || '';
+		setSelectedCity(selectedCityName);
 	};
 
 	const sliderRef = React.useRef<Slider>(null);
@@ -189,7 +167,7 @@ const CitySearch: React.FC<CitySearchProps> = ({ onCitySelect }) => {
 		speed: 500,
 		slidesToShow: 3,
 		slidesToScroll: 3,
-		arrows: false, // Désactive les flèches par défaut de react-slick
+		arrows: true, // Désactive les flèches par défaut de react-slick
 		responsive: [
 			{
 				breakpoint: 1024,
@@ -227,26 +205,22 @@ const CitySearch: React.FC<CitySearchProps> = ({ onCitySelect }) => {
 				</ul>
 			)}
 			<div className="mt-4">
-				<h3 className="text-lg font-semibold mb-2 text-primary">
-					Popular Cities:
-				</h3>
+				<div className="text-center my-8">
+					<h3 className="text-lg font-semibold mb-2 text-primary">
+						Popular Cities:
+					</h3>
+				</div>
 				<div className="relative">
-					<Slider ref={sliderRef} {...settings}>
+					<Slider className="mx-12" ref={sliderRef} {...settings}>
 						{popularCities.map((city) => (
 							<CityCard key={city.name} city={city} onClick={handleCityClick} />
 						))}
 					</Slider>
-					{/* Flèches positionnées sous le slider */}
-					<div className="flex justify-center mt-4">
-						<CustomArrow
-							direction="left"
-							onClick={() => sliderRef.current?.slickPrev()}
-						/>
-						<CustomArrow
-							direction="right"
-							onClick={() => sliderRef.current?.slickNext()}
-						/>
-					</div>
+				</div>
+				<div className="text-center my-8">
+					<h3 className="text-lg font-semibold text-primary">
+						Selected City: {selectedCity ? selectedCity : 'None'}
+					</h3>
 				</div>
 			</div>
 		</div>
