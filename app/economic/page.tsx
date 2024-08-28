@@ -10,6 +10,7 @@ import CO2EmissionsCard from '../components/economic/CO2EmissionsCard';
 import EducationExpenditureCard from '../components/economic/EducationExpenditureCard';
 import { getGDPHistoricalData } from '../services/EconomicService';
 import GDPChart from '../components/economic/GDPChart';
+import EconomicIndicatorsTable from '../components/economic/EconomicIndicatorsTable';
 
 const CountrySelector = dynamic(
 	() => import('../components/economic/CountrySelector'),
@@ -73,25 +74,7 @@ const EconomicPage: React.FC = () => {
 				<GDPChart data={gdpData} />
 			</div>
 
-			<div className="overflow-x-auto">
-				<div className={`grid gap-4 ${gridClasses()}`}>
-					{selectedCountries.map((countryCode) => (
-						<div key={countryCode} className="col-span-1">
-							<h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-4">
-								{countryCode}
-							</h2>
-							<div className="grid gap-4">
-								<GDPGrowthRateCard countryCode={countryCode} />
-								<LifeExpectancyCard countryCode={countryCode} />
-								<UnemploymentRateCard countryCode={countryCode} />
-								<PovertyRateCard countryCode={countryCode} />
-								<CO2EmissionsCard countryCode={countryCode} />
-								<EducationExpenditureCard countryCode={countryCode} />
-							</div>
-						</div>
-					))}
-				</div>
-			</div>
+			<EconomicIndicatorsTable selectedCountries={selectedCountries} />
 		</div>
 	);
 };

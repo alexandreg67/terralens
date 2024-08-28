@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import EconomicDataCard from './EconomicDataCard';
 import Spinner from '../../components/Spinner';
 import { getPovertyRate } from '../../services/EconomicService';
 
-const PovertyRateCard: React.FC<{ countryCode: string }> = ({
+const PovertyRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [povertyRate, setPovertyRate] = useState<number | null>(null);
@@ -27,25 +26,18 @@ const PovertyRateCard: React.FC<{ countryCode: string }> = ({
 		fetchData();
 	}, [countryCode]);
 
-	let content: string | null = null;
-
-	if (loading) {
-		content = '';
-	} else if (error) {
-		content = error;
-	} else if (povertyRate !== null) {
-		content = `${povertyRate.toFixed(2)}%`;
-	} else {
-		content = 'No data available';
-	}
-
 	return (
-		<EconomicDataCard
-			title="Poverty Rate"
-			value={content}
-			description="The percentage of the population living on less than $1.90 a day at 2011 international prices."
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-600">{error}</span>}
+			{!loading && !error && povertyRate !== null && (
+				<span>{povertyRate.toFixed(2)}%</span>
+			)}
+			{!loading && !error && povertyRate === null && (
+				<span>No data available</span>
+			)}
+		</td>
 	);
 };
 
-export default PovertyRateCard;
+export default PovertyRateCell;

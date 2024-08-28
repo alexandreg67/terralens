@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../../components/Spinner';
 import { getEducationExpenditure } from '../../services/EconomicService';
 
-interface EducationExpenditureCardProps {
+interface EducationExpenditureCellProps {
 	countryCode: string;
 }
 
-const EducationExpenditureCard: React.FC<EducationExpenditureCardProps> = ({
+const EducationExpenditureCell: React.FC<EducationExpenditureCellProps> = ({
 	countryCode,
 }) => {
 	const [educationExpenditure, setEducationExpenditure] = useState<
@@ -34,24 +34,18 @@ const EducationExpenditureCard: React.FC<EducationExpenditureCardProps> = ({
 		fetchData();
 	}, [countryCode]);
 
-	const description =
-		'Percentage of GDP spent on education. This indicator shows the priority given by a country to the education sector in relation to its overall economy.';
-
 	return (
-		<EconomicDataCard
-			title="Education Expenditure (% of GDP)"
-			value={
-				loading
-					? 'Loading...'
-					: error
-					? 'Error loading data'
-					: educationExpenditure !== null
-					? `${educationExpenditure.toFixed(2)}%`
-					: 'No data available'
-			}
-			description={description}
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-600">{error}</span>}
+			{!loading && !error && educationExpenditure !== null && (
+				<span>{educationExpenditure.toFixed(2)}%</span>
+			)}
+			{!loading && !error && educationExpenditure === null && (
+				<span>No data available</span>
+			)}
+		</td>
 	);
 };
 
-export default EducationExpenditureCard;
+export default EducationExpenditureCell;

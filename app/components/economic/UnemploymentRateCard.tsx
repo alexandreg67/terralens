@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import EconomicDataCard from './EconomicDataCard';
 import Spinner from '../../components/Spinner';
 import { getUnemploymentRate } from '../../services/EconomicService';
 
-const UnemploymentRateCard: React.FC<{ countryCode: string }> = ({
+const UnemploymentRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [unemploymentRate, setUnemploymentRate] = useState<number | null>(null);
@@ -27,25 +26,18 @@ const UnemploymentRateCard: React.FC<{ countryCode: string }> = ({
 		fetchData();
 	}, [countryCode]);
 
-	let content: string | null = null;
-
-	if (loading) {
-		content = 'Loading...';
-	} else if (error) {
-		content = `Error: ${error}`;
-	} else if (unemploymentRate !== null) {
-		content = `${unemploymentRate.toFixed(2)}%`;
-	} else {
-		content = 'No data available';
-	}
-
 	return (
-		<EconomicDataCard
-			title="Unemployment Rate"
-			value={content}
-			description="The percentage of the labor force that is unemployed and actively seeking work."
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-600">{error}</span>}
+			{!loading && !error && unemploymentRate !== null && (
+				<span>{unemploymentRate.toFixed(2)}%</span>
+			)}
+			{!loading && !error && unemploymentRate === null && (
+				<span>No data available</span>
+			)}
+		</td>
 	);
 };
 
-export default UnemploymentRateCard;
+export default UnemploymentRateCell;

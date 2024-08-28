@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../../components/Spinner';
 import { getHDI } from '../../services/EconomicService';
 
-interface HDICardProps {
+interface HDICellProps {
 	countryCode: string;
 }
 
-const HDICard: React.FC<HDICardProps> = ({ countryCode }) => {
+const HDICell: React.FC<HDICellProps> = ({ countryCode }) => {
 	const [hdi, setHdi] = useState<number | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
@@ -30,24 +30,14 @@ const HDICard: React.FC<HDICardProps> = ({ countryCode }) => {
 		fetchData();
 	}, [countryCode]);
 
-	const description =
-		'The Human Development Index (HDI) is a composite index measuring average achievement in three basic dimensions of human development: life expectancy, education, and income per capita.';
-
 	return (
-		<EconomicDataCard
-			title="Human Development Index (HDI)"
-			value={
-				loading
-					? 'Loading...'
-					: error
-					? 'Error loading data'
-					: hdi !== null
-					? `${hdi.toFixed(2)}`
-					: 'No data available'
-			}
-			description={description}
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-600">{error}</span>}
+			{!loading && !error && hdi !== null && <span>{hdi.toFixed(2)}</span>}
+			{!loading && !error && hdi === null && <span>No data available</span>}
+		</td>
 	);
 };
 
-export default HDICard;
+export default HDICell;

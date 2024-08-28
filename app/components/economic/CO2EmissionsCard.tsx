@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import EconomicDataCard from './EconomicDataCard';
+import Spinner from '../../components/Spinner';
 import { fetchEconomicData } from '../../api/economic/route';
 
-const useEconomicData = (countryCode: string, indicator: string) => {
-	const [data, setData] = useState<number | null>(null);
+interface CO2EmissionsPerCapitaCellProps {
+	countryCode: string;
+}
+
+const CO2EmissionsPerCapitaCell: React.FC<CO2EmissionsPerCapitaCellProps> = ({
+	countryCode,
+}) => {
+	const [co2EmissionsPerCapita, setCo2EmissionsPerCapita] = useState<
+		number | null
+	>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -13,19 +21,19 @@ const useEconomicData = (countryCode: string, indicator: string) => {
 			setError(null);
 
 			try {
-				const result = await fetchEconomicData(countryCode, indicator);
+				const result = await fetchEconomicData(countryCode, 'EN.ATM.CO2E.PC');
 				const latestValidValue = result.find(
 					(entry: { value: null }) => entry.value !== null
 				);
 
 				if (latestValidValue) {
-					setData(latestValidValue.value);
+					setCo2EmissionsPerCapita(latestValidValue.value);
 				} else {
 					console.error('No valid data found:', result);
-					setData(null);
+					setCo2EmissionsPerCapita(null);
 				}
 			} catch (err) {
-				console.error('Error fetching economic data:', err);
+				console.error('Error fetching CO2 emissions data:', err);
 				setError('Failed to load data');
 			} finally {
 				setLoading(false);
@@ -33,35 +41,20 @@ const useEconomicData = (countryCode: string, indicator: string) => {
 		};
 
 		fetchData();
-	}, [countryCode, indicator]);
-
-	return { data, loading, error };
-};
-
-const CO2EmissionsPerCapitaCard: React.FC<{ countryCode: string }> = ({
-	countryCode,
-}) => {
-	const {
-		data: co2EmissionsPerCapita,
-		loading,
-		error,
-	} = useEconomicData(countryCode, 'EN.ATM.CO2E.PC');
+	}, [countryCode]);
 
 	return (
-		<EconomicDataCard
-			title="CO2 Emissions per Capita"
-			value={
-				loading
-					? 'Loading...'
-					: error
-					? 'Error loading data'
-					: co2EmissionsPerCapita !== null
-					? `${co2EmissionsPerCapita.toFixed(2)} tons per person`
-					: 'No data available'
-			}
-			description="The amount of CO2 emissions per person, measured in metric tons."
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-600">{error}</span>}
+			{!loading && !error && co2EmissionsPerCapita !== null && (
+				<span>{co2EmissionsPerCapita.toFixed(2)} tons per person</span>
+			)}
+			{!loading && !error && co2EmissionsPerCapita === null && (
+				<span>No data available</span>
+			)}
+		</td>
 	);
 };
 
-export default CO2EmissionsPerCapitaCard;
+export default CO2EmissionsPerCapitaCell;

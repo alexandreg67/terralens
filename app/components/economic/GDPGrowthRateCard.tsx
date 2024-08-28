@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getGDPGrowthRate } from '../../services/EconomicService';
-import EconomicDataCard from './EconomicDataCard';
 import Spinner from '../Spinner';
+import { getGDPGrowthRate } from '../../services/EconomicService';
 import { formatPercentage } from '../../utils/formatting';
 
-const GDPGrowthRateCard: React.FC<{ countryCode: string }> = ({
+const GDPGrowthRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const [growthRate, setGrowthRate] = useState<number | null>(null);
@@ -28,23 +27,18 @@ const GDPGrowthRateCard: React.FC<{ countryCode: string }> = ({
 		fetchData();
 	}, [countryCode]);
 
-	let content: string | number | null | React.ReactElement;
-
-	if (loading) {
-		content = <Spinner />;
-	} else if (error) {
-		content = <span className="text-red-500">{error}</span>;
-	} else {
-		content = formatPercentage(growthRate) as string;
-	}
-
 	return (
-		<EconomicDataCard
-			title="GDP Growth Rate"
-			value={content as string | number | null}
-			description="The annual percentage growth rate of GDP at market prices based on constant local currency."
-		/>
+		<td aria-live="polite">
+			{loading && <Spinner />}
+			{error && <span className="text-red-500">{error}</span>}
+			{!loading && !error && growthRate !== null && (
+				<span>{formatPercentage(growthRate)}</span>
+			)}
+			{!loading && !error && growthRate === null && (
+				<span>No data available</span>
+			)}
+		</td>
 	);
 };
 
-export default GDPGrowthRateCard;
+export default GDPGrowthRateCell;
