@@ -7,9 +7,9 @@ import LifeExpectancyCard from '../components/economic/LifeExpectancyCard';
 import UnemploymentRateCard from '../components/economic/UnemploymentRateCard';
 import PovertyRateCard from '../components/economic/PovertyRateCard';
 import CO2EmissionsCard from '../components/economic/CO2EmissionsCard';
-import GDPChart from '../components/economic/GDPChart';
 import EducationExpenditureCard from '../components/economic/EducationExpenditureCard';
 import { getGDPHistoricalData } from '../services/EconomicService';
+import GDPChart from '../components/economic/GDPChart';
 
 const CountrySelector = dynamic(
 	() => import('../components/economic/CountrySelector'),
@@ -37,6 +37,13 @@ const EconomicPage: React.FC = () => {
 		setGdpData(data);
 	};
 
+	const gridClasses = () => {
+		if (selectedCountries.length === 1) return 'grid-cols-1 place-items-center';
+		if (selectedCountries.length === 2) return 'grid-cols-2';
+		if (selectedCountries.length === 3)
+			return 'grid-cols-1 md:grid-cols-3 place-items-center';
+		return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+	};
 	useEffect(() => {
 		fetchGdpData(selectedCountries);
 	}, [selectedCountries]);
@@ -66,21 +73,25 @@ const EconomicPage: React.FC = () => {
 				<GDPChart data={gdpData} />
 			</div>
 
-			{selectedCountries.map((countryCode) => (
-				<div key={countryCode} className="mb-8">
-					<h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-						{countryCode}
-					</h2>
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-						<GDPGrowthRateCard countryCode={countryCode} />
-						<LifeExpectancyCard countryCode={countryCode} />
-						<UnemploymentRateCard countryCode={countryCode} />
-						<PovertyRateCard countryCode={countryCode} />
-						<CO2EmissionsCard countryCode={countryCode} />
-						<EducationExpenditureCard countryCode={countryCode} />
-					</div>
+			<div className="overflow-x-auto">
+				<div className={`grid gap-4 ${gridClasses()}`}>
+					{selectedCountries.map((countryCode) => (
+						<div key={countryCode} className="col-span-1">
+							<h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-4">
+								{countryCode}
+							</h2>
+							<div className="grid gap-4">
+								<GDPGrowthRateCard countryCode={countryCode} />
+								<LifeExpectancyCard countryCode={countryCode} />
+								<UnemploymentRateCard countryCode={countryCode} />
+								<PovertyRateCard countryCode={countryCode} />
+								<CO2EmissionsCard countryCode={countryCode} />
+								<EducationExpenditureCard countryCode={countryCode} />
+							</div>
+						</div>
+					))}
 				</div>
-			))}
+			</div>
 		</div>
 	);
 };
