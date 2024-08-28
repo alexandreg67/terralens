@@ -1,53 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Spinner from '../../components/Spinner';
 import {
-	getGDPGrowthRate,
-	getLifeExpectancy,
-	getUnemploymentRate,
-	getPovertyRate,
 	getCO2EmissionsPerCapita,
-	getHDI,
 	getEducationExpenditure,
-} from '../../services/EconomicService';
-
-const indicators = [
-	{
-		title: 'CO2 Emissions per Capita',
-		description: 'CO2 emissions per capita in tons',
-		fetchData: getCO2EmissionsPerCapita,
-	},
-	{
-		title: 'GDP Growth Rate',
-		description: 'Annual percentage growth rate of GDP',
-		fetchData: getGDPGrowthRate,
-	},
-	{
-		title: 'Unemployment Rate',
-		description: 'Percentage of the labor force that is unemployed',
-		fetchData: getUnemploymentRate,
-	},
-	{
-		title: 'Poverty Rate',
-		description: 'Percentage of the population living below the poverty line',
-		fetchData: getPovertyRate,
-	},
-	{
-		title: 'Life Expectancy',
-		description: 'Average number of years a newborn is expected to live',
-		fetchData: getLifeExpectancy,
-	},
-	{
-		title: 'Human Development Index (HDI)',
-		description:
-			'Composite statistic of life expectancy, education, and income indices',
-		fetchData: getHDI,
-	},
-	{
-		title: 'Education Expenditure',
-		description: 'Public expenditure on education as a percentage of GDP',
-		fetchData: getEducationExpenditure,
-	},
-];
+	getGDPGrowthRate,
+	getHDI,
+	getLifeExpectancy,
+	getPovertyRate,
+	getUnemploymentRate,
+} from '@/app/services/EconomicService';
 
 const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
 	selectedCountries,
@@ -56,29 +17,86 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
+	// Définition du tableau `indicators` dans le même fichier
+	const indicators = [
+		{
+			title: 'CO2 Emissions per Capita',
+			description: 'CO2 emissions per capita in tons',
+			unit: 'tons per person',
+			fetchData: getCO2EmissionsPerCapita,
+		},
+		{
+			title: 'GDP Growth Rate',
+			description: 'Annual percentage growth rate of GDP',
+			unit: '%',
+			fetchData: getGDPGrowthRate,
+		},
+		{
+			title: 'Unemployment Rate',
+			description: 'Percentage of the labor force that is unemployed',
+			unit: '%',
+			fetchData: getUnemploymentRate,
+		},
+		{
+			title: 'Poverty Rate',
+			description: 'Percentage of the population living below the poverty line',
+			unit: '%',
+			fetchData: getPovertyRate,
+		},
+		{
+			title: 'Life Expectancy',
+			description: 'Average number of years a newborn is expected to live',
+			unit: 'years',
+			fetchData: getLifeExpectancy,
+		},
+		{
+			title: 'Human Development Index (HDI)',
+			description:
+				'Composite statistic of life expectancy, education, and income indices',
+			unit: '', // Pas d'unité pour l'HDI
+			fetchData: getHDI,
+		},
+		{
+			title: 'Education Expenditure',
+			description: 'Public expenditure on education as a percentage of GDP',
+			unit: '% of GDP',
+			fetchData: getEducationExpenditure,
+		},
+	];
+
 	useEffect(() => {
 		const fetchData = async () => {
-			try {
-				setLoading(true);
-				setError(null);
+			setLoading(true);
+			setError(null);
 
-				const result: { [key: string]: any } = {};
-				for (let countryCode of selectedCountries) {
-					result[countryCode] = {};
-					for (let indicator of indicators) {
-						try {
-							const value = await indicator.fetchData(countryCode);
-							result[countryCode][indicator.title] = value;
-						} catch (err) {
-							console.error(
-								`Error fetching ${indicator.title} for ${countryCode}:`,
-								err
-							);
-							result[countryCode][indicator.title] = 'Error';
-						}
-					}
-				}
-				setData(result);
+			try {
+				const result = await Promise.all(
+					selectedCountries.map(async (countryCode) => {
+						const countryData: { [key: string]: any } = {};
+						await Promise.all(
+							indicators.map(async (indicator) => {
+								try {
+									const value = await indicator.fetchData(countryCode);
+									countryData[indicator.title] = value;
+								} catch (err) {
+									console.error(
+										`Error fetching ${indicator.title} for ${countryCode}:`,
+										err
+									);
+									countryData[indicator.title] = 'Error';
+								}
+							})
+						);
+						return { [countryCode]: countryData };
+					})
+				);
+
+				// Merge results into one object
+				const mergedResult = result.reduce(
+					(acc, curr) => ({ ...acc, ...curr }),
+					{}
+				);
+				setData(mergedResult);
 			} catch (err) {
 				console.error('Error fetching economic data:', err);
 				setError('Failed to load data.');
@@ -136,12 +154,15 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
 									{data[countryCode] &&
 									data[countryCode][indicator.title] !== undefined ? (
 										data[countryCode][indicator.title] !== 'Error' ? (
-											`${data[countryCode][indicator.title]?.toFixed(2)}`
+											<span>
+												{data[countryCode][indicator.title]?.toFixed(2)}{' '}
+												{indicator.unit}
+											</span>
 										) : (
 											<span className="text-red-600">Error</span>
 										)
 									) : (
-										'No data'
+										<span className="text-gray-500">No data</span>
 									)}
 								</td>
 							))}

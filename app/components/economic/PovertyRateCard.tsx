@@ -5,21 +5,24 @@ import { getPovertyRate } from '../../services/EconomicService';
 const PovertyRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
-	const [povertyRate, setPovertyRate] = useState<number | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		povertyRate: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ povertyRate: null, loading: true, error: null });
 			try {
 				const rate = await getPovertyRate(countryCode);
-				setPovertyRate(rate);
+				setState({ povertyRate: rate, loading: false, error: null });
 			} catch (err) {
-				setError('Failed to fetch poverty rate data.');
-			} finally {
-				setLoading(false);
+				setState({
+					povertyRate: null,
+					loading: false,
+					error: 'Failed to fetch poverty rate data.',
+				});
 			}
 		};
 
@@ -28,13 +31,14 @@ const PovertyRateCell: React.FC<{ countryCode: string }> = ({
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-600">{error}</span>}
-			{!loading && !error && povertyRate !== null && (
-				<span>{povertyRate.toFixed(2)}%</span>
-			)}
-			{!loading && !error && povertyRate === null && (
-				<span>No data available</span>
+			{state.loading ? (
+				<Spinner />
+			) : state.error ? (
+				<span className="text-red-600">{state.error}</span>
+			) : state.povertyRate !== null ? (
+				<span>{state.povertyRate.toFixed(2)}%</span>
+			) : (
+				<span className="text-gray-500">No data available</span>
 			)}
 		</td>
 	);

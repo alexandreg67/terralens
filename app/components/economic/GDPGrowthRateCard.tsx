@@ -6,21 +6,24 @@ import { formatPercentage } from '../../utils/formatting';
 const GDPGrowthRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
-	const [growthRate, setGrowthRate] = useState<number | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		growthRate: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ growthRate: null, loading: true, error: null });
 			try {
 				const rate = await getGDPGrowthRate(countryCode);
-				setGrowthRate(rate);
+				setState({ growthRate: rate, loading: false, error: null });
 			} catch (err) {
-				setError('Failed to fetch GDP growth rate.');
-			} finally {
-				setLoading(false);
+				setState({
+					growthRate: null,
+					loading: false,
+					error: 'Failed to fetch GDP growth rate.',
+				});
 			}
 		};
 
@@ -29,13 +32,14 @@ const GDPGrowthRateCell: React.FC<{ countryCode: string }> = ({
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-500">{error}</span>}
-			{!loading && !error && growthRate !== null && (
-				<span>{formatPercentage(growthRate)}</span>
-			)}
-			{!loading && !error && growthRate === null && (
-				<span>No data available</span>
+			{state.loading ? (
+				<Spinner />
+			) : state.error ? (
+				<span className="text-red-500">{state.error}</span>
+			) : state.growthRate !== null ? (
+				<span>{formatPercentage(state.growthRate)}</span>
+			) : (
+				<span className="text-gray-500">No data available</span>
 			)}
 		</td>
 	);

@@ -5,21 +5,24 @@ import { getLifeExpectancy } from '../../services/EconomicService';
 const LifeExpectancyCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
-	const [lifeExpectancy, setLifeExpectancy] = useState<number | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		lifeExpectancy: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ lifeExpectancy: null, loading: true, error: null });
 			try {
 				const lifeExpectancy = await getLifeExpectancy(countryCode);
-				setLifeExpectancy(lifeExpectancy);
+				setState({ lifeExpectancy, loading: false, error: null });
 			} catch (err) {
-				setError('Failed to fetch life expectancy data.');
-			} finally {
-				setLoading(false);
+				setState({
+					lifeExpectancy: null,
+					loading: false,
+					error: 'Failed to fetch life expectancy data.',
+				});
 			}
 		};
 
@@ -28,13 +31,14 @@ const LifeExpectancyCell: React.FC<{ countryCode: string }> = ({
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-600">{error}</span>}
-			{!loading && !error && lifeExpectancy !== null && (
-				<span>{lifeExpectancy.toFixed(2)} years</span>
-			)}
-			{!loading && !error && lifeExpectancy === null && (
-				<span>No data available</span>
+			{state.loading ? (
+				<Spinner />
+			) : state.error ? (
+				<span className="text-red-600">{state.error}</span>
+			) : state.lifeExpectancy !== null ? (
+				<span>{state.lifeExpectancy.toFixed(2)} years</span>
+			) : (
+				<span className="text-gray-500">No data available</span>
 			)}
 		</td>
 	);

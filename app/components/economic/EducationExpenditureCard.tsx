@@ -9,25 +9,26 @@ interface EducationExpenditureCellProps {
 const EducationExpenditureCell: React.FC<EducationExpenditureCellProps> = ({
 	countryCode,
 }) => {
-	const [educationExpenditure, setEducationExpenditure] = useState<
-		number | null
-	>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		educationExpenditure: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ educationExpenditure: null, loading: true, error: null });
 
 			try {
 				const data = await getEducationExpenditure(countryCode);
-				setEducationExpenditure(data);
+				setState({ educationExpenditure: data, loading: false, error: null });
 			} catch (err) {
 				console.error('Error fetching education expenditure data:', err);
-				setError('Failed to load data');
-			} finally {
-				setLoading(false);
+				setState({
+					educationExpenditure: null,
+					loading: false,
+					error: 'Failed to load data',
+				});
 			}
 		};
 
@@ -36,13 +37,14 @@ const EducationExpenditureCell: React.FC<EducationExpenditureCellProps> = ({
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-600">{error}</span>}
-			{!loading && !error && educationExpenditure !== null && (
-				<span>{educationExpenditure.toFixed(2)}%</span>
-			)}
-			{!loading && !error && educationExpenditure === null && (
-				<span>No data available</span>
+			{state.loading ? (
+				<Spinner />
+			) : state.error ? (
+				<span className="alert alert-error text-red-600">{state.error}</span>
+			) : state.educationExpenditure !== null ? (
+				<span>{state.educationExpenditure.toFixed(2)}%</span>
+			) : (
+				<span className="text-gray-500">No data available</span>
 			)}
 		</td>
 	);

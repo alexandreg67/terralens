@@ -7,23 +7,22 @@ interface HDICellProps {
 }
 
 const HDICell: React.FC<HDICellProps> = ({ countryCode }) => {
-	const [hdi, setHdi] = useState<number | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		hdi: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ hdi: null, loading: true, error: null });
 
 			try {
 				const data = await getHDI(countryCode);
-				setHdi(data);
+				setState({ hdi: data, loading: false, error: null });
 			} catch (err) {
 				console.error('Error fetching HDI data:', err);
-				setError('Failed to load data');
-			} finally {
-				setLoading(false);
+				setState({ hdi: null, loading: false, error: 'Failed to load data' });
 			}
 		};
 
@@ -32,10 +31,15 @@ const HDICell: React.FC<HDICellProps> = ({ countryCode }) => {
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-600">{error}</span>}
-			{!loading && !error && hdi !== null && <span>{hdi.toFixed(2)}</span>}
-			{!loading && !error && hdi === null && <span>No data available</span>}
+			{state.loading ? (
+				<Spinner />
+			) : state.error ? (
+				<span className="text-red-600">{state.error}</span>
+			) : state.hdi !== null ? (
+				<span>{state.hdi.toFixed(2)}</span>
+			) : (
+				<span className="text-gray-500">No data available</span>
+			)}
 		</td>
 	);
 };

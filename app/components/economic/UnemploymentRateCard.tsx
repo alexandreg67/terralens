@@ -5,21 +5,24 @@ import { getUnemploymentRate } from '../../services/EconomicService';
 const UnemploymentRateCell: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
-	const [unemploymentRate, setUnemploymentRate] = useState<number | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
-	const [error, setError] = useState<string | null>(null);
+	const [state, setState] = useState({
+		unemploymentRate: null as number | null,
+		loading: true,
+		error: null as string | null,
+	});
 
 	useEffect(() => {
 		const fetchData = async () => {
-			setLoading(true);
-			setError(null);
+			setState({ unemploymentRate: null, loading: true, error: null });
 			try {
 				const rate = await getUnemploymentRate(countryCode);
-				setUnemploymentRate(rate);
+				setState({ unemploymentRate: rate, loading: false, error: null });
 			} catch (err) {
-				setError('Failed to fetch unemployment rate data.');
-			} finally {
-				setLoading(false);
+				setState({
+					unemploymentRate: null,
+					loading: false,
+					error: 'Failed to fetch unemployment rate data.',
+				});
 			}
 		};
 
@@ -28,13 +31,15 @@ const UnemploymentRateCell: React.FC<{ countryCode: string }> = ({
 
 	return (
 		<td aria-live="polite">
-			{loading && <Spinner />}
-			{error && <span className="text-red-600">{error}</span>}
-			{!loading && !error && unemploymentRate !== null && (
-				<span>{unemploymentRate.toFixed(2)}%</span>
+			{state.loading && <Spinner />}
+			{state.error && (
+				<span className="alert alert-error text-red-600">{state.error}</span>
 			)}
-			{!loading && !error && unemploymentRate === null && (
-				<span>No data available</span>
+			{!state.loading && !state.error && state.unemploymentRate !== null && (
+				<span>{state.unemploymentRate.toFixed(2)}%</span>
+			)}
+			{!state.loading && !state.error && state.unemploymentRate === null && (
+				<span className="text-gray-500">No data available</span>
 			)}
 		</td>
 	);
