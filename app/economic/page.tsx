@@ -2,30 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import GDPGrowthRateCard from '../components/economic/GDPGrowthRateCard';
-import LifeExpectancyCard from '../components/economic/LifeExpectancyCard';
-import UnemploymentRateCard from '../components/economic/UnemploymentRateCard';
-import PovertyRateCard from '../components/economic/PovertyRateCard';
-import CO2EmissionsCard from '../components/economic/CO2EmissionsCard';
-import EducationExpenditureCard from '../components/economic/EducationExpenditureCard';
-import { getGDPHistoricalData } from '../services/EconomicService';
+import {
+	getGDPHistoricalData,
+	getCO2EmissionsPerCapita,
+} from '../services/EconomicService';
 import GDPChart from '../components/economic/GDPChart';
 import EconomicIndicatorsTable from '../components/economic/EconomicIndicatorsTable';
+import CO2ComparisonChart from '../components/economic/CO2ComparisonChart';
 
 const CountrySelector = dynamic(
 	() => import('../components/economic/CountrySelector'),
 	{ ssr: false }
 );
 
-const EconomicPage: React.FC = () => {
-	const [selectedCountries, setSelectedCountries] = useState<string[]>(['US']);
-	const [gdpData, setGdpData] = useState<
-		Array<{ country: string; data: { year: string; value: number }[] }>
-	>([]);
+const EconomicPage = () => {
+	// Initialisation de l'état pour les données du PIB et du CO2
+	const [selectedCountries, setSelectedCountries] = useState(['US']);
+	const [gdpData, setGdpData] = useState<{ country: string; data: any }[]>([]);
+	const [co2Data, setCo2Data] = useState<CO2Data[]>([]);
+
+	interface CO2Data {
+		country: string;
+		co2Emissions: number | null;
+	}
 
 	const handleCountryChange = (countryCodes: string[]) => {
 		setSelectedCountries(countryCodes);
 		fetchGdpData(countryCodes);
+		fetchCo2Data(countryCodes); // Fetch CO2 data
 	};
 
 	const fetchGdpData = async (countryCodes: string[]) => {
@@ -38,15 +42,19 @@ const EconomicPage: React.FC = () => {
 		setGdpData(data);
 	};
 
-	const gridClasses = () => {
-		if (selectedCountries.length === 1) return 'grid-cols-1 place-items-center';
-		if (selectedCountries.length === 2) return 'grid-cols-2';
-		if (selectedCountries.length === 3)
-			return 'grid-cols-1 md:grid-cols-3 place-items-center';
-		return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+	const fetchCo2Data = async (countryCodes: any[]) => {
+		const data = await Promise.all(
+			countryCodes.map(async (code) => {
+				const co2PerCapita = await getCO2EmissionsPerCapita(code);
+				return { country: code, co2Emissions: co2PerCapita }; // Structurez bien les données
+			})
+		);
+		setCo2Data(data); // Mettez à jour l'état avec les données CO2
 	};
+
 	useEffect(() => {
 		fetchGdpData(selectedCountries);
+		fetchCo2Data(selectedCountries); // Fetch CO2 data au chargement initial
 	}, [selectedCountries]);
 
 	return (
@@ -62,18 +70,16 @@ const EconomicPage: React.FC = () => {
 					have evolved over time.
 				</p>
 			</div>
-
 			<div className="max-w-lg mx-auto mb-6">
 				<CountrySelector
 					selectedCountries={selectedCountries}
 					onCountryChange={handleCountryChange}
 				/>
 			</div>
-
 			<div className="mb-6">
 				<GDPChart data={gdpData} />
 			</div>
-
+			<CO2ComparisonChart countryCodes={selectedCountries} />{' '}
 			<EconomicIndicatorsTable selectedCountries={selectedCountries} />
 		</div>
 	);

@@ -1,14 +1,14 @@
+// services/EconomicService.js
+
 import { fetchEconomicData } from '../api/economic/route';
 import { EconomicDataPoint } from '../types/economicTypes';
 
 // Fonction pour récupérer toutes les données de PIB sur une période pour un pays
-export const getGDPHistoricalData = async (
-	countryCode: string
-): Promise<{ year: string; value: number }[]> => {
+export const getGDPHistoricalData = async (countryCode: string) => {
 	const data = await fetchEconomicData(countryCode, 'NY.GDP.MKTP.CD');
 	return data
-		.filter((entry: EconomicDataPoint) => entry.value !== null)
-		.map((entry: EconomicDataPoint) => ({
+		.filter((entry: { value: null }) => entry.value !== null)
+		.map((entry: { date: any; value: any }) => ({
 			year: entry.date,
 			value: entry.value,
 		}))
@@ -22,10 +22,10 @@ export const getGDPHistoricalData = async (
 const getLatestValidEconomicData = async (
 	countryCode: string,
 	indicator: string
-): Promise<number | null> => {
+) => {
 	const data = await fetchEconomicData(countryCode, indicator);
 	const latestValidValue = data.find(
-		(entry: EconomicDataPoint) => entry.value !== null
+		(entry: { value: null }) => entry.value !== null
 	);
 	return latestValidValue ? latestValidValue.value : null;
 };
@@ -62,4 +62,47 @@ export const getHDI = (countryCode: string) => {
 
 export const getEducationExpenditure = (countryCode: string) => {
 	return getLatestValidEconomicData(countryCode, 'SE.XPD.TOTL.GD.ZS');
+};
+
+// services/EconomicService.js
+
+export const getGreenhouseGasEmissions = async (countryCode: string) => {
+	try {
+		const data = await getLatestValidEconomicData(
+			countryCode,
+			'EN.ATM.GHGT.KT.CE'
+		);
+		return data;
+	} catch (error) {
+		console.error(
+			`Error fetching greenhouse gas emissions for ${countryCode}:`,
+			error
+		);
+		return null;
+	}
+};
+
+export const getMethaneEmissions = async (countryCode: string) => {
+	const data = await getLatestValidEconomicData(
+		countryCode,
+		'EN.ATM.METH.KT.CE'
+	);
+	console.log('Methane Emissions Data:', data);
+	return data;
+};
+
+export const getCO2EmissionsTotal = (countryCode: string) => {
+	return getLatestValidEconomicData(countryCode, 'EN.ATM.CO2E.KT');
+};
+
+export const getAgriculturalLandUse = (countryCode: string) => {
+	return getLatestValidEconomicData(countryCode, 'AG.LND.AGRI.ZS');
+};
+
+export const getRenewableEnergyUse = (countryCode: string) => {
+	return getLatestValidEconomicData(countryCode, 'EG.FEC.RNEW.ZS');
+};
+
+export const getGreenhouseGasEmissionsTotal = (countryCode: string) => {
+	return getLatestValidEconomicData(countryCode, 'EN.ATM.GHGT.KT.CE');
 };
