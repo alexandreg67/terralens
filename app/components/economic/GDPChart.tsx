@@ -11,8 +11,11 @@ import {
 } from 'recharts';
 
 interface GDPChartProps {
-	data: Array<{ year: string; value: number }>;
-	lineColor?: string; // Option pour personnaliser la couleur de la ligne
+	data: Array<{
+		country: string;
+		data: Array<{ year: string; value: number }>;
+	}>;
+	lineColors?: string[]; // Option pour personnaliser les couleurs des lignes
 	width?: number | string; // Option pour personnaliser la largeur du conteneur
 	height?: number; // Option pour personnaliser la hauteur du conteneur
 	gridColor?: string; // Option pour personnaliser la couleur de la grille
@@ -32,7 +35,7 @@ const formatYAxis = (tickItem: number) => {
 
 const GDPChart: React.FC<GDPChartProps> = ({
 	data,
-	lineColor = '#8884d8',
+	lineColors = ['#8884d8', '#82ca9d', '#ff7300'], // Couleurs par défaut pour plusieurs lignes
 	width = '100%',
 	height = 300,
 	gridColor = '#ccc',
@@ -40,6 +43,23 @@ const GDPChart: React.FC<GDPChartProps> = ({
 	if (!data || data.length === 0) {
 		return <p>No data available for the selected period.</p>;
 	}
+
+	// Rassembler les années uniques
+	const allYears = Array.from(
+		new Set(data.flatMap((countryData) => countryData.data.map((d) => d.year)))
+	).sort();
+
+	// Fusionner les données en un seul tableau
+	const combinedData = allYears.map((year) => {
+		const yearData: { [key: string]: string | number } = { year };
+		data.forEach((countryData) => {
+			const countryYearData = countryData.data.find((d) => d.year === year);
+			yearData[countryData.country] = countryYearData
+				? countryYearData.value
+				: '';
+		});
+		return yearData;
+	});
 
 	return (
 		<div
@@ -50,8 +70,8 @@ const GDPChart: React.FC<GDPChartProps> = ({
 				GDP Over Time
 			</h3>
 			<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-				The chart below shows the Gross Domestic Product (GDP) of a country over
-				time.
+				The chart below shows the Gross Domestic Product (GDP) of selected
+				countries over time.
 				<br />
 				<strong>X-Axis:</strong> Years (e.g., 2000, 2005, 2010)
 				<br />
@@ -60,7 +80,7 @@ const GDPChart: React.FC<GDPChartProps> = ({
 			</p>
 			<ResponsiveContainer width={width} height={height}>
 				<LineChart
-					data={data}
+					data={combinedData} // Utiliser les données combinées
 					margin={{
 						top: 5,
 						right: 30,
@@ -73,12 +93,16 @@ const GDPChart: React.FC<GDPChartProps> = ({
 					<YAxis tickFormatter={formatYAxis} />
 					<Tooltip />
 					<Legend />
-					<Line
-						type="monotone"
-						dataKey="value"
-						stroke={lineColor}
-						activeDot={{ r: 8 }}
-					/>
+					{data.map((countryData, index) => (
+						<Line
+							key={countryData.country}
+							type="monotone"
+							dataKey={countryData.country}
+							name={countryData.country}
+							stroke={lineColors[index % lineColors.length]}
+							activeDot={{ r: 8 }}
+						/>
+					))}
 				</LineChart>
 			</ResponsiveContainer>
 		</div>

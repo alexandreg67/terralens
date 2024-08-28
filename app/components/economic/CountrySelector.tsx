@@ -1,18 +1,14 @@
 import React from 'react';
-
-interface CountryOption {
-	value: string;
-	label: string;
-}
+import { Country } from '../../types/economicTypes';
 
 interface CountrySelectorProps {
-	selectedCountry: string | null;
-	onCountryChange: (countryCode: string) => void;
-	countries?: { code: string; name: string }[];
+	selectedCountries: string[]; // Tableau des pays sélectionnés
+	onCountryChange: (countryCodes: string[]) => void;
+	countries?: Country[]; // Utilisation de l'interface `Country`
 }
 
 const CountrySelector: React.FC<CountrySelectorProps> = ({
-	selectedCountry,
+	selectedCountries,
 	onCountryChange,
 	countries = [
 		{ code: 'US', name: 'United States' },
@@ -40,34 +36,47 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 	const sortedCountries = countries.sort((a, b) =>
 		a.name.localeCompare(b.name)
 	);
-	const options: CountryOption[] = sortedCountries.map((country) => ({
-		value: country.code,
-		label: country.name,
-	}));
+
+	const handleCheckboxChange = (countryCode: string) => {
+		let updatedSelection;
+		if (selectedCountries.includes(countryCode)) {
+			// Retirer le pays s'il est déjà sélectionné
+			updatedSelection = selectedCountries.filter(
+				(country) => country !== countryCode
+			);
+		} else {
+			// Ajouter le pays s'il n'est pas encore sélectionné
+			updatedSelection = [...selectedCountries, countryCode];
+		}
+
+		if (updatedSelection.length <= 3) {
+			onCountryChange(updatedSelection);
+		} else {
+			alert('You can only select up to 3 countries.');
+		}
+	};
 
 	return (
 		<div className="mb-4">
-			<label
-				htmlFor="country-select"
-				className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-			>
-				Select a Country
+			<label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+				Select Countries
 			</label>
-			<select
-				id="country-select"
-				value={selectedCountry || ''}
-				onChange={(e) => onCountryChange(e.target.value)}
-				className="mt-1 block w-full text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-			>
-				<option value="" disabled>
-					Select a country
-				</option>
-				{options.map((option) => (
-					<option key={option.value} value={option.value}>
-						{option.label}
-					</option>
+			<div className="grid grid-cols-2 gap-2">
+				{sortedCountries.map((country) => (
+					<div key={country.code} className="flex items-center">
+						<input
+							type="checkbox"
+							id={country.code}
+							checked={selectedCountries.includes(country.code)}
+							onChange={() => handleCheckboxChange(country.code)}
+							className="mr-2"
+						/>
+						<label htmlFor={country.code} className="text-sm">
+							{country.name}
+						</label>
+					</div>
 				))}
-			</select>
+			</div>
 		</div>
 	);
 };

@@ -38,30 +38,30 @@ const useEconomicData = (countryCode: string, indicator: string) => {
 	return { data, loading, error };
 };
 
-const CO2EmissionsCard: React.FC<{ countryCode: string }> = ({
+const CO2EmissionsPerCapitaCard: React.FC<{ countryCode: string }> = ({
 	countryCode,
 }) => {
 	const {
-		data: co2Emissions,
+		data: co2EmissionsPerCapita,
 		loading,
 		error,
-	} = useEconomicData(countryCode, 'EN.ATM.CO2E.KT');
+	} = useEconomicData(countryCode, 'EN.ATM.CO2E.PC');
 
 	return (
 		<EconomicDataCard
-			title="CO2 Emissions"
+			title="CO2 Emissions per Capita"
 			value={
 				loading
 					? 'Loading...'
 					: error
 					? 'Error loading data'
-					: co2Emissions !== null
-					? `${co2Emissions.toLocaleString()} kt`
+					: co2EmissionsPerCapita !== null
+					? `${co2EmissionsPerCapita.toFixed(2)} tons per person`
 					: 'No data available'
 			}
-			description="The total emissions of CO2 from burning fossil fuels and manufacturing, measured in kilotonnes (kt)."
+			description="The amount of CO2 emissions per person, measured in metric tons."
 		/>
 	);
 };
 
-export default CO2EmissionsCard;
+export default CO2EmissionsPerCapitaCard;
