@@ -59,15 +59,20 @@ const EconomicPage = () => {
 
 	return (
 		<div className="container mx-auto p-6">
-			<div className="text-center mb-6">
-				<h1 className="text-4xl font-bold mb-2 text-primary">
-					Economic Data Dashboard
-				</h1>
-				<p className="text-lg text-gray-700 dark:text-gray-300">
-					Explore key economic indicators for different countries. This page
-					provides insights into the economic performance, highlighting
-					important metrics like the Gross Domestic Product (GDP), and how they
-					have evolved over time.
+			<div className="mb-6">
+				<h2 className="text-3xl font-semibold text-primary text-center">
+					Overview of Economic Performance
+				</h2>
+				<p className="text-gray-700 dark:text-gray-300 text-center">
+					This dashboard provides a comparative overview of key economic
+					indicators across selected countries. Understand how different nations
+					perform in terms of economic growth, environmental impact, and social
+					development.
+				</p>
+				<p className="text-gray-700 dark:text-gray-300 text-center">
+					You can compare up to 3 countries at a time to understand their
+					environmental performance. Higher emissions per capita often indicate
+					greater environmental pressures and less sustainable practices.
 				</p>
 			</div>
 			<div className="max-w-lg mx-auto mb-6">
@@ -77,10 +82,45 @@ const EconomicPage = () => {
 				/>
 			</div>
 			<div className="mb-6">
+				<h2 className="text-3xl font-semibold text-primary mb-4 text-center">
+					GDP Over Time
+				</h2>
+				<p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
+					The chart below illustrates the Gross Domestic Product (GDP) of
+					selected countries over time, providing insights into their economic
+					growth and development. The X-axis represents the years, while the
+					Y-axis displays the GDP values in trillions (T), billions (B), or
+					millions (M) of USD. Analyze the trends to understand how the
+					economies of these countries have evolved over the years.
+				</p>
 				<GDPChart data={gdpData} />
 			</div>
-			<CO2ComparisonChart countryCodes={selectedCountries} />{' '}
-			<EconomicIndicatorsTable selectedCountries={selectedCountries} />
+			<div className="mb-6">
+				<h2 className="text-3xl font-semibold text-primary mb-4 text-center">
+					Environmental Impact Comparison
+				</h2>
+				<p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
+					This chart compares the CO2 emissions per capita across selected
+					countries, providing insights into each nation's environmental impact
+					relative to its population size. Higher emissions per capita often
+					indicate greater environmental pressures and less sustainable
+					practices.
+				</p>
+				<CO2ComparisonChart countryCodes={selectedCountries} />
+			</div>
+
+			<div className="mb-6">
+				<h2 className="text-3xl font-semibold text-primary mb-4 text-center">
+					Key Economic Indicators Comparison
+				</h2>
+				<p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
+					Compare the most important economic indicators across selected
+					countries to gain insights into their economic performance and
+					development. This table highlights key metrics such as GDP growth, CO2
+					emissions, and human development indices.
+				</p>
+				<EconomicIndicatorsTable selectedCountries={selectedCountries} />
+			</div>
 		</div>
 	);
 };

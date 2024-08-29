@@ -58,9 +58,6 @@ const CO2ComparisonChart = ({ countryCodes }: { countryCodes: string[] }) => {
 	const methaneEmissions = data.map((item) => item.methaneEmissions);
 
 	const co2Emissions = data.map((item) => item.co2Emissions);
-	const greenhouseGasEmissionsTotal = data.map(
-		(item) => item.greenhouseGasEmissionsTotal
-	);
 
 	const chartData = {
 		labels: countries,
@@ -79,11 +76,6 @@ const CO2ComparisonChart = ({ countryCodes }: { countryCodes: string[] }) => {
 				label: 'CO2 Emissions (kt)',
 				data: co2Emissions,
 				backgroundColor: 'rgba(255, 99, 132, 0.6)',
-			},
-			{
-				label: 'Greenhouse Gas Emissions Total (kt of CO2 equivalent)',
-				data: greenhouseGasEmissionsTotal,
-				backgroundColor: 'rgba(54, 162, 235, 0.6)',
 			},
 		],
 	};
@@ -122,9 +114,6 @@ const CO2ComparisonChart = ({ countryCodes }: { countryCodes: string[] }) => {
 
 	return (
 		<div className="mt-6">
-			<h2 className="text-center text-2xl font-bold mb-4">
-				Environmental Impact Comparison
-			</h2>
 			<Bar data={chartData} options={chartOptions} />
 		</div>
 	);

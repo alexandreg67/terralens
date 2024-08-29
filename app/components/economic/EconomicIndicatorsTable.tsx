@@ -21,44 +21,50 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
 	const indicators = [
 		{
 			title: 'CO2 Emissions per Capita',
-			description: 'CO2 emissions per capita in tons',
+			description:
+				'The average amount of carbon dioxide emissions produced per person annually, measured in tons. This indicator reflects the environmental impact of a country’s population.',
 			unit: 'tons per person',
 			fetchData: getCO2EmissionsPerCapita,
 		},
 		{
 			title: 'GDP Growth Rate',
-			description: 'Annual percentage growth rate of GDP',
+			description:
+				'The annual percentage increase in a country’s Gross Domestic Product, reflecting the overall economic health and expansion rate of the economy.',
 			unit: '%',
 			fetchData: getGDPGrowthRate,
 		},
 		{
 			title: 'Unemployment Rate',
-			description: 'Percentage of the labor force that is unemployed',
+			description:
+				'The percentage of the labor force that is without work but actively seeking employment. It’s an important indicator of the labor market’s health.',
 			unit: '%',
 			fetchData: getUnemploymentRate,
 		},
 		{
 			title: 'Poverty Rate',
-			description: 'Percentage of the population living below the poverty line',
+			description:
+				'The percentage of the population living below the national poverty line, highlighting the prevalence of poverty within a country.',
 			unit: '%',
 			fetchData: getPovertyRate,
 		},
 		{
 			title: 'Life Expectancy',
-			description: 'Average number of years a newborn is expected to live',
+			description:
+				'The average number of years a newborn is expected to live under current mortality rates, reflecting the overall health and living conditions of a country.',
 			unit: 'years',
 			fetchData: getLifeExpectancy,
 		},
 		{
 			title: 'Human Development Index (HDI)',
 			description:
-				'Composite statistic of life expectancy, education, and income indices',
-			unit: '', // Pas d'unité pour l'HDI
+				'A composite index measuring average achievement in three basic dimensions of human development: health (life expectancy), education, and standard of living (income per capita).',
+			unit: '',
 			fetchData: getHDI,
 		},
 		{
 			title: 'Education Expenditure',
-			description: 'Public expenditure on education as a percentage of GDP',
+			description:
+				'Public expenditure on education as a percentage of Gross Domestic Product (GDP), indicating the importance placed on education by the government.',
 			unit: '% of GDP',
 			fetchData: getEducationExpenditure,
 		},

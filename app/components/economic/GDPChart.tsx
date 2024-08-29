@@ -66,13 +66,7 @@ const GDPChart: React.FC<GDPChartProps> = ({
 			className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
 			aria-label="GDP Chart over Time"
 		>
-			<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-				GDP Over Time
-			</h3>
 			<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-				The chart below shows the Gross Domestic Product (GDP) of selected
-				countries over time.
-				<br />
 				<strong>X-Axis:</strong> Years (e.g., 2000, 2005, 2010)
 				<br />
 				<strong>Y-Axis:</strong> GDP in trillions (T), billions (B), or millions
