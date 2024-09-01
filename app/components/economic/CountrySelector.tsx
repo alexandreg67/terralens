@@ -60,23 +60,21 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		<div className="mb-4">
 			<label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
 				Select Countries
-			</label>
-			<div className="grid grid-cols-2 gap-2">
-				{sortedCountries.map((country) => (
-					<div key={country.code} className="flex items-center">
-						<input
-							type="checkbox"
-							id={country.code}
-							checked={selectedCountries.includes(country.code)}
-							onChange={() => handleCheckboxChange(country.code)}
-							className="mr-2"
-						/>
-						<label htmlFor={country.code} className="text-sm">
+				<div className="grid grid-cols-2 gap-2">
+					{sortedCountries.map((country) => (
+						<label key={country.code} className="flex items-center text-sm">
+							<input
+								id={country.code}
+								type="checkbox"
+								checked={selectedCountries.includes(country.code)}
+								onChange={() => handleCheckboxChange(country.code)}
+								className="mr-2"
+							/>
 							{country.name}
 						</label>
-					</div>
-				))}
-			</div>
+					))}
+				</div>
+			</label>
 		</div>
 	);
 };

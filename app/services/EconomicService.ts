@@ -1,9 +1,5 @@
-// services/EconomicService.js
+import { fetchEconomicData } from '../services/EconomicDataFetcher';
 
-import { fetchEconomicData } from '../api/economic/route';
-import { EconomicDataPoint } from '../types/economicTypes';
-
-// Fonction pour récupérer toutes les données de PIB sur une période pour un pays
 export const getGDPHistoricalData = async (countryCode: string) => {
 	const data = await fetchEconomicData(countryCode, 'NY.GDP.MKTP.CD');
 	return data
