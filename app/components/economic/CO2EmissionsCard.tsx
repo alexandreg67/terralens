@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Spinner from '../../components/Spinner';
-import { fetchEconomicData } from '../../api/economic/route';
+import { fetchEconomicData } from '../../services/EconomicDataFetcher';
 
 interface CO2EmissionsPerCapitaCellProps {
 	countryCode: string;
