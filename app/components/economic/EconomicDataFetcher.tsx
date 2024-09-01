@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import EconomicDataCard from './EconomicDataCard';
 import Spinner from '../../components/Spinner';
+import { fetchEconomicData } from '@/app/services/EconomicDataFetcher';
 
 const GDPChart = dynamic(() => import('./GDPChart'), {
 	ssr: false,
@@ -27,10 +28,6 @@ interface CountryGDPData {
 	data: YearValueData[];
 }
 
-interface GDPChartProps {
-	data: CountryGDPData[];
-}
-
 const useGDPData = (countryCode: string) => {
 	const [gdp, setGdp] = useState<number | null>(null);
 	const [gdpHistory, setGdpHistory] = useState<CountryGDPData[]>([]);
@@ -42,20 +39,18 @@ const useGDPData = (countryCode: string) => {
 			setLoading(true);
 			setError(null);
 			try {
-				const response = await fetch(
-					`https://api.worldbank.org/v2/country/${countryCode}/indicator/NY.GDP.MKTP.CD?format=json`
-				);
-				const data = await response.json();
-				if (data && data[1]) {
-					setGdp(data[1][0]?.value ?? null);
-					const history = data[1]
+				// Utilisation du service fetchEconomicData
+				const data = await fetchEconomicData(countryCode, 'NY.GDP.MKTP.CD');
+
+				if (data.length > 0) {
+					setGdp(data[0]?.value ?? null);
+					const history = data
 						.filter((item: any) => item.value !== null)
 						.map((item: any) => ({
 							year: item.date,
 							value: item.value,
 						}));
 
-					// Transforme l'historique des données pour correspondre au type CountryGDPData[]
 					const transformedHistory: CountryGDPData = {
 						country: countryCode,
 						data: history.reverse(), // Pour avoir les années dans l'ordre croissant
