@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { LatLngBounds } from 'leaflet';
 import { debounce } from 'lodash';
 import RadioFilter from '../components/geospatial/RadioFilter';
@@ -16,84 +16,93 @@ const GeospatialPage: React.FC = () => {
 	const [center, setCenter] = useState<[number, number]>([48.8566, 2.3522]); // Centre par défaut : Paris
 	const activeRequestRef = React.useRef<AbortController | null>(null);
 
-	const generateOverpassQuery = (bounds: LatLngBounds): string => {
-		const southWest = bounds.getSouthWest();
-		const northEast = bounds.getNorthEast();
-		const bbox = `${southWest.lat},${southWest.lng},${northEast.lat},${northEast.lng}`;
+	const generateOverpassQuery = useCallback(
+		(bounds: LatLngBounds): string => {
+			const southWest = bounds.getSouthWest();
+			const northEast = bounds.getNorthEast();
+			const bbox = `${southWest.lat},${southWest.lng},${northEast.lat},${northEast.lng}`;
 
-		let query = '[out:json][timeout:25];(';
+			let query = '[out:json][timeout:25];(';
 
-		if (selectedFilter === 'monument') {
-			query += `node["historic"="monument"]["name"](${bbox});`;
-		} else if (selectedFilter === 'museum') {
-			query += `node["tourism"="museum"]["name"](${bbox});`;
-		} else if (selectedFilter === 'park') {
-			query += `node["leisure"="park"]["name"](${bbox});`;
-		} else if (selectedFilter === 'viewpoint') {
-			query += `node["tourism"="viewpoint"]["name"](${bbox});`;
-		} else if (selectedFilter === 'place_of_worship') {
-			query += `node["amenity"="place_of_worship"]["name"](${bbox});`;
-		}
-
-		query += ');out body;>;out skel qt;';
-		return query;
-	};
-
-	const fetchStations = async (bounds: LatLngBounds) => {
-		if (mapZoom >= 12) {
-			const query = generateOverpassQuery(bounds);
-			setLoading(true); // Début du chargement
-
-			// Annuler la requête précédente si elle est encore en cours
-			if (activeRequestRef.current) {
-				activeRequestRef.current.abort();
+			if (selectedFilter === 'monument') {
+				query += `node["historic"="monument"]["name"](${bbox});`;
+			} else if (selectedFilter === 'museum') {
+				query += `node["tourism"="museum"]["name"](${bbox});`;
+			} else if (selectedFilter === 'park') {
+				query += `node["leisure"="park"]["name"](${bbox});`;
+			} else if (selectedFilter === 'viewpoint') {
+				query += `node["tourism"="viewpoint"]["name"](${bbox});`;
+			} else if (selectedFilter === 'place_of_worship') {
+				query += `node["amenity"="place_of_worship"]["name"](${bbox});`;
 			}
 
-			const abortController = new AbortController();
-			activeRequestRef.current = abortController;
+			query += ');out body;>;out skel qt;';
+			return query;
+		},
+		[selectedFilter]
+	);
+	const fetchStations = useCallback(
+		async (bounds: LatLngBounds) => {
+			if (mapZoom >= 12) {
+				const query = generateOverpassQuery(bounds);
+				setLoading(true); // Début du chargement
 
-			try {
-				const response = await fetch('/api/overpass', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({ query }),
-					signal: abortController.signal,
-				});
-
-				if (!response.ok) {
-					throw new Error(`HTTP error! status: ${response.status}`);
+				// Annuler la requête précédente si elle est encore en cours
+				if (activeRequestRef.current) {
+					activeRequestRef.current.abort();
 				}
 
-				const result = await response.json();
-				if (result && result.data) {
-					setStations(result.data);
-				} else {
-					console.warn('Aucune donnée trouvée');
-					setStations([]); // Assurez-vous de vider l'état en cas d'absence de données
+				const abortController = new AbortController();
+				activeRequestRef.current = abortController;
+
+				try {
+					const response = await fetch('/api/overpass', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({ query }),
+						signal: abortController.signal,
+					});
+
+					if (!response.ok) {
+						throw new Error(`HTTP error! status: ${response.status}`);
+					}
+
+					const result = await response.json();
+					if (result && result.data) {
+						setStations(result.data);
+					} else {
+						console.warn('Aucune donnée trouvée');
+						setStations([]); // Assurez-vous de vider l'état en cas d'absence de données
+					}
+				} catch (error) {
+					if ((error as Error).name !== 'AbortError') {
+						console.error(
+							'Erreur lors de la récupération des données Overpass :',
+							error
+						);
+						setStations([]); // Assurez-vous de vider l'état en cas d'erreur
+					}
+				} finally {
+					setLoading(false); // Fin du chargement
 				}
-			} catch (error) {
-				if ((error as Error).name !== 'AbortError') {
-					console.error(
-						'Erreur lors de la récupération des données Overpass :',
-						error
-					);
-					setStations([]); // Assurez-vous de vider l'état en cas d'erreur
-				}
-			} finally {
-				setLoading(false); // Fin du chargement
 			}
-		}
-	};
+		},
+		[mapZoom, generateOverpassQuery, setLoading, setStations, activeRequestRef]
+	);
 
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const handleBoundsChange = useCallback(
-		debounce((bounds: LatLngBounds, zoom: number) => {
+		(bounds: LatLngBounds, zoom: number) => {
 			setMapZoom(zoom);
 			fetchStations(bounds);
-		}, 500),
-		[selectedFilter]
+		},
+		[fetchStations, setMapZoom]
+	);
+
+	const debouncedHandleBoundsChange = useMemo(
+		() => debounce(handleBoundsChange, 500),
+		[handleBoundsChange]
 	);
 
 	const handleCitySelect = (lat: number, lon: number) => {
@@ -107,7 +116,7 @@ const GeospatialPage: React.FC = () => {
 			[center[0] + 0.1, center[1] + 0.1]
 		);
 		fetchStations(bounds);
-	}, [center, selectedFilter]); // Relancer la recherche lorsque le centre ou le filtre change
+	}, [center, selectedFilter, fetchStations]); // Relancer la recherche lorsque le centre ou le filtre change
 
 	return (
 		<div className="container mx-auto p-6">
