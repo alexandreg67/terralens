@@ -1,10 +1,4 @@
-import { cache } from 'react';
-
-interface Cache {
-	[key: string]: any;
-}
-
-const dataCache: Cache = cache as Cache;
+const dataCache: Record<string, any> = {};
 
 export const fetchEconomicData = async (
 	countryCode: string,
@@ -27,8 +21,8 @@ export const fetchEconomicData = async (
 			throw new Error('Invalid API response');
 		}
 
-		// Caching data in memory (you can replace this with a more persistent solution)
-		(dataCache as Cache)[cacheKey] = data[1];
+		// Caching data in memory
+		dataCache[cacheKey] = data[1];
 
 		return data[1];
 	} catch (error) {
