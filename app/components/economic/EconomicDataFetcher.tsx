@@ -13,13 +13,23 @@ interface EconomicDataFetcherProps {
 }
 
 interface GDPData {
+	country: string;
+	data: YearValueData[];
+}
+
+interface YearValueData {
 	year: string;
 	value: number;
 }
 
+interface CountryGDPData {
+	country: string;
+	data: YearValueData[];
+}
+
 const useGDPData = (countryCode: string) => {
 	const [gdp, setGdp] = useState<number | null>(null);
-	const [gdpHistory, setGdpHistory] = useState<GDPData[]>([]);
+	const [gdpHistory, setGdpHistory] = useState<CountryGDPData[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 

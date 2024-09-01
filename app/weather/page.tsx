@@ -129,7 +129,7 @@ const WeatherPage: React.FC = () => {
 		if (chartElement) {
 			chartElement.scrollIntoView({ behavior: 'smooth' });
 		}
-	}, [weatherData]);
+	}, []);
 
 	useEffect(() => {
 		if (weatherData) {
