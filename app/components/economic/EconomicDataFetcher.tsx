@@ -27,6 +27,10 @@ interface CountryGDPData {
 	data: YearValueData[];
 }
 
+interface GDPChartProps {
+	data: CountryGDPData[];
+}
+
 const useGDPData = (countryCode: string) => {
 	const [gdp, setGdp] = useState<number | null>(null);
 	const [gdpHistory, setGdpHistory] = useState<CountryGDPData[]>([]);
@@ -50,7 +54,14 @@ const useGDPData = (countryCode: string) => {
 							year: item.date,
 							value: item.value,
 						}));
-					setGdpHistory(history.reverse()); // Pour avoir les années dans l'ordre croissant
+
+					// Transforme l'historique des données pour correspondre au type CountryGDPData[]
+					const transformedHistory: CountryGDPData = {
+						country: countryCode,
+						data: history.reverse(), // Pour avoir les années dans l'ordre croissant
+					};
+
+					setGdpHistory([transformedHistory]); // Placez dans un tableau
 				} else {
 					setError('No data available');
 				}
