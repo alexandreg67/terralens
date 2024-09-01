@@ -16,15 +16,43 @@ const CountrySelector = dynamic(
 );
 
 const EconomicPage = () => {
-	// Initialisation de l'état pour les données du PIB et du CO2
 	const [selectedCountries, setSelectedCountries] = useState(['US']);
 	const [gdpData, setGdpData] = useState<{ country: string; data: any }[]>([]);
 	const [co2Data, setCo2Data] = useState<CO2Data[]>([]);
+	const [startYear, setStartYear] = useState<number | null>(null);
+	const [endYear, setEndYear] = useState<number | null>(null);
+	const [filteredGdpData, setFilteredGdpData] = useState<
+		{ country: string; data: any }[]
+	>([]);
+	const [minYear, setMinYear] = useState<number | null>(null);
+	const [maxYear, setMaxYear] = useState<number | null>(null);
 
 	interface CO2Data {
 		country: string;
 		co2Emissions: number | null;
 	}
+	useEffect(() => {
+		// Calcule les années min et max une fois que les données sont chargées
+		if (gdpData.length > 0) {
+			const allYears = gdpData.flatMap((countryData) =>
+				countryData.data.map((d: { year: any }) => d.year)
+			);
+			setMinYear(Math.min(...allYears));
+			setMaxYear(Math.max(...allYears));
+		}
+	}, [gdpData]);
+
+	// Fonction pour filtrer les données du PIB en fonction des dates
+	const filterGdpData = (data: any[]) => {
+		if (!startYear || !endYear) return data; // Pas de filtre si les dates ne sont pas définies
+
+		return data.map((countryData) => ({
+			...countryData,
+			data: countryData.data.filter(
+				(d: { year: number }) => d.year >= startYear && d.year <= endYear
+			),
+		}));
+	};
 
 	const handleCountryChange = (countryCodes: string[]) => {
 		setSelectedCountries(countryCodes);
@@ -42,6 +70,20 @@ const EconomicPage = () => {
 		setGdpData(data);
 	};
 
+	useEffect(() => {
+		// Calcule les années min et max une fois que les données sont chargées
+		if (gdpData.length > 0) {
+			const allYears = gdpData.flatMap((countryData) =>
+				countryData.data.map((d: { year: any }) => d.year)
+			);
+			setMinYear(Math.min(...allYears));
+			setMaxYear(Math.max(...allYears));
+
+			// Initialise filteredGdpData avec toutes les données au chargement initial
+			setFilteredGdpData(gdpData);
+		}
+	}, [gdpData]);
+
 	const fetchCo2Data = async (countryCodes: any[]) => {
 		const data = await Promise.all(
 			countryCodes.map(async (code) => {
@@ -56,6 +98,17 @@ const EconomicPage = () => {
 		fetchGdpData(selectedCountries);
 		fetchCo2Data(selectedCountries); // Fetch CO2 data au chargement initial
 	}, [selectedCountries]);
+
+	const handleApplyFilters = () => {
+		// Vérification de la validité des dates
+		if (startYear && endYear && startYear > endYear) {
+			alert("L'année de début doit être inférieure ou égale à l'année de fin.");
+			return; // Empêche la mise à jour du graphique si les dates sont invalides
+		}
+
+		// Met à jour l'état avec les données filtrées
+		setFilteredGdpData(filterGdpData(gdpData));
+	};
 
 	return (
 		<div className="container mx-auto p-6">
@@ -93,7 +146,57 @@ const EconomicPage = () => {
 					millions (M) of USD. Analyze the trends to understand how the
 					economies of these countries have evolved over the years.
 				</p>
-				<GDPChart data={gdpData} />
+
+				{/* Filtres de date avec saisie directe des années et limitation des valeurs */}
+				<div className="flex justify-center items-end mb-4 space-x-4">
+					<div>
+						<label
+							htmlFor="startYear"
+							className="block text-sm font-medium text-secondary"
+						>
+							{' '}
+							Start Year :
+						</label>
+						<input
+							type="number"
+							id="startYear"
+							value={startYear || ''}
+							onChange={(e) => setStartYear(parseInt(e.target.value) || null)}
+							min={minYear !== null ? minYear.toString() : undefined}
+							max={endYear?.toString()}
+							className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm" // Utilise focus:ring-primary et focus:border-primary
+						/>
+					</div>
+
+					<div>
+						<label
+							htmlFor="endYear"
+							className="block text-sm font-medium text-secondary"
+						>
+							{' '}
+							End Year :
+						</label>
+						<input
+							type="number"
+							id="endYear"
+							value={endYear || ''}
+							onChange={(e) => setEndYear(parseInt(e.target.value) || null)}
+							min={startYear?.toString() || minYear?.toString()}
+							max={maxYear?.toString()}
+							className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm" // Utilise focus:ring-primary et focus:border-primary
+						/>
+					</div>
+
+					<button
+						onClick={handleApplyFilters}
+						className="bg-primary hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+					>
+						Apply
+					</button>
+				</div>
+
+				{/* Utilise les données filtrées */}
+				<GDPChart data={filteredGdpData} />
 			</div>
 			<div className="mb-6">
 				<h2 className="text-3xl font-semibold text-primary mb-4 text-center">
@@ -101,10 +204,10 @@ const EconomicPage = () => {
 				</h2>
 				<p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
 					This chart compares the CO2 emissions per capita across selected
-					countries, providing insights into each nation's environmental impact
-					relative to its population size. Higher emissions per capita often
-					indicate greater environmental pressures and less sustainable
-					practices.
+					countries, providing insights into each nation&apos;s environmental
+					impact relative to its population size. Higher emissions per capita
+					often indicate greater environmental pressures and less sustainable
+					practices.{' '}
 				</p>
 				<CO2ComparisonChart countryCodes={selectedCountries} />
 			</div>
