@@ -110,14 +110,15 @@ const GeospatialPage: React.FC = () => {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			// Assurez-vous que window est défini
-			const bounds = new LatLngBounds(
-				[center[0] - 0.1, center[1] - 0.1], // Création de bornes approximatives autour du centre
-				[center[0] + 0.1, center[1] + 0.1]
-			);
-			fetchStations(bounds);
+			import('leaflet').then(({ LatLngBounds }) => {
+				const bounds = new LatLngBounds(
+					[center[0] - 0.1, center[1] - 0.1],
+					[center[0] + 0.1, center[1] + 0.1]
+				);
+				fetchStations(bounds);
+			});
 		}
-	}, [center, selectedFilter, fetchStations]); // Relancer la recherche lorsque le centre ou le filtre change
+	}, [center, selectedFilter, fetchStations]);
 
 	return (
 		<div className="container mx-auto p-6">
