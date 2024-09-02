@@ -4,10 +4,10 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { LatLngBounds } from 'leaflet';
 import { debounce } from 'lodash';
 import RadioFilter from '../components/geospatial/RadioFilter';
-import MapWithMarkers from '../components/geospatial/MapWithMarkers';
 import Spinner from '../components/Spinner';
 import CitySearch from '../components/geospatial/CitySearch';
 import { fetchOverpassData } from '../services/OverpassService';
+import dynamic from 'next/dynamic';
 
 const GeospatialPage: React.FC = () => {
 	const [stations, setStations] = useState<any[]>([]);
@@ -16,6 +16,13 @@ const GeospatialPage: React.FC = () => {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [center, setCenter] = useState<[number, number]>([48.8566, 2.3522]); // Centre par défaut : Paris
 	const activeRequestRef = React.useRef<AbortController | null>(null);
+
+	const MapWithMarkers = dynamic(
+		() => import('../components/geospatial/MapWithMarkers'),
+		{
+			ssr: false,
+		}
+	);
 
 	const generateOverpassQuery = useCallback(
 		(bounds: LatLngBounds): string => {

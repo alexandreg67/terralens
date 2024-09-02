@@ -12,6 +12,7 @@ const CitySearchInput: React.FC<CitySearchInputProps> = ({
 	return (
 		<div className="w-full flex justify-center my-4">
 			<input
+				id="city-search"
 				type="text"
 				value={query}
 				onChange={onChange}
