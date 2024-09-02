@@ -43,7 +43,7 @@ const GeospatialPage: React.FC = () => {
 	);
 	const fetchStations = useCallback(
 		async (bounds: LatLngBounds) => {
-			if (mapZoom >= 12) {
+			if (mapZoom >= 12 && typeof window !== 'undefined') {
 				const query = generateOverpassQuery(bounds);
 				setLoading(true); // Début du chargement
 
@@ -111,11 +111,14 @@ const GeospatialPage: React.FC = () => {
 	};
 
 	useEffect(() => {
-		const bounds = new LatLngBounds(
-			[center[0] - 0.1, center[1] - 0.1], // Création de bornes approximatives autour du centre
-			[center[0] + 0.1, center[1] + 0.1]
-		);
-		fetchStations(bounds);
+		if (typeof window !== 'undefined') {
+			// Assurez-vous que window est défini
+			const bounds = new LatLngBounds(
+				[center[0] - 0.1, center[1] - 0.1], // Création de bornes approximatives autour du centre
+				[center[0] + 0.1, center[1] + 0.1]
+			);
+			fetchStations(bounds);
+		}
 	}, [center, selectedFilter, fetchStations]); // Relancer la recherche lorsque le centre ou le filtre change
 
 	return (
