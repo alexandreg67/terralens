@@ -91,7 +91,7 @@ const EconomicPage = () => {
 				return { country: code, co2Emissions: co2PerCapita }; // Structurez bien les données
 			})
 		);
-		setCo2Data(data); // Mettez à jour l'état avec les données CO2
+		setCo2Data(data); // Mettre à jour l'état avec les données CO2
 	};
 
 	useEffect(() => {

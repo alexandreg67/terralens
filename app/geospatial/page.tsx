@@ -7,6 +7,7 @@ import RadioFilter from '../components/geospatial/RadioFilter';
 import MapWithMarkers from '../components/geospatial/MapWithMarkers';
 import Spinner from '../components/Spinner';
 import CitySearch from '../components/geospatial/CitySearch';
+import { fetchOverpassData } from '../services/OverpassService';
 
 const GeospatialPage: React.FC = () => {
 	const [stations, setStations] = useState<any[]>([]);
@@ -41,6 +42,7 @@ const GeospatialPage: React.FC = () => {
 		},
 		[selectedFilter]
 	);
+
 	const fetchStations = useCallback(
 		async (bounds: LatLngBounds) => {
 			if (mapZoom >= 12 && typeof window !== 'undefined') {
@@ -56,22 +58,11 @@ const GeospatialPage: React.FC = () => {
 				activeRequestRef.current = abortController;
 
 				try {
-					const response = await fetch('/api/overpass', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify({ query }),
-						signal: abortController.signal,
-					});
+					// Utiliser le service pour obtenir les données
+					const result = await fetchOverpassData(query);
 
-					if (!response.ok) {
-						throw new Error(`HTTP error! status: ${response.status}`);
-					}
-
-					const result = await response.json();
-					if (result && result.data) {
-						setStations(result.data);
+					if (result && result.length > 0) {
+						setStations(result);
 					} else {
 						console.warn('Aucune donnée trouvée');
 						setStations([]); // Assurez-vous de vider l'état en cas d'absence de données
