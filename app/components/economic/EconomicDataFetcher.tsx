@@ -6,16 +6,11 @@ import { fetchEconomicData } from '@/app/services/EconomicDataFetcher';
 
 const GDPChart = dynamic(() => import('./GDPChart'), {
 	ssr: false,
-	loading: () => <Spinner />, // Utilisation du Spinner pendant le chargement du graphique
+	loading: () => <Spinner />,
 });
 
 interface EconomicDataFetcherProps {
 	countryCode: string;
-}
-
-interface GDPData {
-	country: string;
-	data: YearValueData[];
 }
 
 interface YearValueData {
@@ -39,9 +34,7 @@ const useGDPData = (countryCode: string) => {
 			setLoading(true);
 			setError(null);
 			try {
-				// Utilisation du service fetchEconomicData
 				const data = await fetchEconomicData(countryCode, 'NY.GDP.MKTP.CD');
-
 				if (data.length > 0) {
 					setGdp(data[0]?.value ?? null);
 					const history = data
@@ -51,12 +44,13 @@ const useGDPData = (countryCode: string) => {
 							value: item.value,
 						}));
 
+					// Créer un objet `CountryGDPData` avec le pays et les données
 					const transformedHistory: CountryGDPData = {
 						country: countryCode,
-						data: history.reverse(), // Pour avoir les années dans l'ordre croissant
+						data: history.reverse(),
 					};
 
-					setGdpHistory([transformedHistory]); // Placez dans un tableau
+					setGdpHistory([transformedHistory]); // Mettre dans un tableau
 				} else {
 					setError('No data available');
 				}
