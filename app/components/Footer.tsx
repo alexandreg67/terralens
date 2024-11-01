@@ -5,12 +5,12 @@ const Footer: React.FC = () => {
 		<footer className="bg-secondary text-white p-6 text-center px-6">
 			<div className="flex justify-center space-x-4 mb-4">
 				<a
-					href="https://linkedin.com/in/yourprofile"
+					href="www.linkedin.com/in/graff-alexandre"
 					className="hover:text-accent"
 				>
 					<i className="fab fa-linkedin"></i>
 				</a>
-				<a href="https://github.com/yourprofile" className="hover:text-accent">
+				<a href="https://github.com/alexandreg67" className="hover:text-accent">
 					<i className="fab fa-github"></i>
 				</a>
 				<a href="https://twitter.com/yourprofile" className="hover:text-accent">
@@ -19,7 +19,10 @@ const Footer: React.FC = () => {
 			</div>
 			<p>&copy; 2024 TerraLens. All rights reserved.</p>
 			<p>
-				<a href="https://your-portfolio-link.com" className="hover:text-accent">
+				<a
+					href="https://mon-portfolio-gray.vercel.app/"
+					className="hover:text-accent"
+				>
 					Visit my portfolio
 				</a>
 			</p>
