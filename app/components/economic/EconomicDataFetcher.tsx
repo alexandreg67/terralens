@@ -3,6 +3,7 @@ import dynamic from "next/dynamic";
 import EconomicDataCard from "./EconomicDataCard";
 import Spinner from "../../components/Spinner";
 import { fetchEconomicData } from "../../services/EconomicDataFetcher";
+import { WorldBankDataPoint } from "../../types/economicTypes";
 
 const GDPChart = dynamic(() => import("./GDPChart"), {
   ssr: false,
@@ -38,8 +39,8 @@ const useGDPData = (countryCode: string) => {
         if (data.length > 0) {
           setGdp(data[0]?.value ?? null);
           const history = data
-            .filter((item: any) => item.value !== null)
-            .map((item: any) => ({
+            .filter((item: WorldBankDataPoint): item is WorldBankDataPoint & { value: number } => item.value !== null)
+            .map((item: WorldBankDataPoint & { value: number }) => ({
               year: item.date,
               value: item.value,
             }));
