@@ -5,16 +5,17 @@ import L, { LatLngBounds } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import StationPopup from './StationPopup';
 import SetViewOnChange from './SetViewOnChange';
+import { Station } from '../../types/geospatialTypes';
 
 interface MapWithMarkersProps {
-	stations: any[];
+	stations: Station[];
 	mapZoom: number;
 	onBoundsChange: (bounds: LatLngBounds, zoom: number) => void;
 	center: [number, number];
-	cityName: string; // Nouveau prop pour le nom de la ville
+	cityName: string;
 }
 
-const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
+const MapWithMarkers: React.FC<MapWithMarkersProps> = React.memo(({
 	stations,
 	mapZoom,
 	onBoundsChange,
@@ -23,16 +24,32 @@ const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 }) => {
 	const mapRef = React.useRef<L.Map | null>(null);
 
+	const handleMoveEnd = React.useCallback(() => {
+		const map = mapRef.current;
+		if (map) {
+			onBoundsChange(map.getBounds(), map.getZoom());
+		}
+	}, [onBoundsChange]);
+
 	React.useEffect(() => {
 		const map = mapRef.current;
 		if (map) {
-			const onMoveEnd = () => onBoundsChange(map.getBounds(), map.getZoom());
-			map.on('moveend', onMoveEnd);
+			map.on('moveend', handleMoveEnd);
 			return () => {
-				map.off('moveend', onMoveEnd);
+				map.off('moveend', handleMoveEnd);
 			};
 		}
-	}, [onBoundsChange]);
+	}, [handleMoveEnd]);
+
+	const markerIcon = React.useMemo(() => new L.Icon({
+		iconUrl: '/images/marker-icon.png',
+		shadowUrl: '/images/marker-shadow.png',
+		iconRetinaUrl: '/images/marker-icon-2x.png',
+		iconSize: [25, 41],
+		iconAnchor: [12, 41],
+		popupAnchor: [1, -34],
+		shadowSize: [41, 41],
+	}), []);
 
 	return (
 		<div className="relative">
@@ -50,21 +67,11 @@ const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 					attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				/>
-				{stations.map((station, index) => (
+				{stations.map((station) => (
 					<Marker
-						key={index}
+						key={station.id}
 						position={[station.lat, station.lon]}
-						icon={
-							new L.Icon({
-								iconUrl: '/images/marker-icon.png',
-								shadowUrl: '/images/marker-shadow.png',
-								iconRetinaUrl: '/images/marker-icon-2x.png',
-								iconSize: [25, 41],
-								iconAnchor: [12, 41],
-								popupAnchor: [1, -34],
-								shadowSize: [41, 41],
-							})
-						}
+						icon={markerIcon}
 					>
 						<StationPopup station={station} />
 					</Marker>
@@ -72,6 +79,8 @@ const MapWithMarkers: React.FC<MapWithMarkersProps> = ({
 			</MapContainer>
 		</div>
 	);
-};
+});
+
+MapWithMarkers.displayName = 'MapWithMarkers';
 
 export default MapWithMarkers;

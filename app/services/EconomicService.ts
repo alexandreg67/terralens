@@ -1,16 +1,21 @@
 import { fetchEconomicData } from "../services/EconomicDataFetcher";
+import { WorldBankDataPoint } from "../types/economicTypes";
 
-export const getGDPHistoricalData = async (countryCode: string) => {
+interface GDPHistoricalEntry {
+  year: string;
+  value: number;
+}
+
+export const getGDPHistoricalData = async (countryCode: string): Promise<GDPHistoricalEntry[]> => {
   const data = await fetchEconomicData(countryCode, "NY.GDP.MKTP.CD");
   return data
-    .filter((entry: { value: null }) => entry.value !== null)
-    .map((entry: { date: any; value: any }) => ({
+    .filter((entry: WorldBankDataPoint) => entry.value !== null)
+    .map((entry: WorldBankDataPoint) => ({
       year: entry.date,
-      value: entry.value,
+      value: entry.value as number,
     }))
-    .sort(
-      (a: { year: string }, b: { year: string }) =>
-        parseInt(a.year) - parseInt(b.year)
+    .sort((a: GDPHistoricalEntry, b: GDPHistoricalEntry) =>
+      parseInt(a.year) - parseInt(b.year)
     );
 };
 
@@ -18,55 +23,53 @@ export const getGDPHistoricalData = async (countryCode: string) => {
 const getLatestValidEconomicData = async (
   countryCode: string,
   indicator: string
-) => {
+): Promise<number | null> => {
   const data = await fetchEconomicData(countryCode, indicator);
   const latestValidValue = data.find(
-    (entry: { value: null }) => entry.value !== null
+    (entry: WorldBankDataPoint) => entry.value !== null
   );
   return latestValidValue ? latestValidValue.value : null;
 };
 
 // Fonctions spécifiques utilisant la fonction générique
-export const getGDPGrowthRate = (countryCode: string) => {
+export const getGDPGrowthRate = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "NY.GDP.MKTP.KD.ZG");
 };
 
-export const getLifeExpectancy = (countryCode: string) => {
+export const getLifeExpectancy = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "SP.DYN.LE00.IN");
 };
 
-export const getUnemploymentRate = (countryCode: string) => {
+export const getUnemploymentRate = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "SL.UEM.TOTL.ZS");
 };
 
-export const getPovertyRate = (countryCode: string) => {
+export const getPovertyRate = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "SI.POV.DDAY");
 };
 
-export const getCO2Emissions = (countryCode: string) => {
+export const getCO2Emissions = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "EN.ATM.CO2E.LF.KT");
 };
 
-export const getCO2EmissionsPerCapita = (countryCode: string) => {
-  // L'indicateur EN.ATM.CO2E.PC représente les émissions de CO2 par habitant
+export const getCO2EmissionsPerCapita = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "EN.ATM.CO2E.PC");
 };
 
-export const getHDI = (countryCode: string) => {
-  return getLatestValidEconomicData(countryCode, "NY.GDP.PCAP.CD"); // L'indicateur pour l'IDH peut varier, NY.GDP.PCAP.CD représente souvent le RNB par habitant utilisé dans le calcul de l'IDH
+export const getHDI = (countryCode: string): Promise<number | null> => {
+  return getLatestValidEconomicData(countryCode, "NY.GDP.PCAP.CD");
 };
 
-export const getEducationExpenditure = (countryCode: string) => {
+export const getEducationExpenditure = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "SE.XPD.TOTL.GD.ZS");
 };
 
-// services/EconomicService.js
-
-export const getGreenhouseGasEmissions = async (countryCode: string) => {
+// Fonctions environnementales spécialisées
+export const getGreenhouseGasEmissions = async (countryCode: string): Promise<number | null> => {
   try {
     const data = await getLatestValidEconomicData(
       countryCode,
-      "EN.ATM.GHGO.KT.CE" // Remplacé par un indicateur de gaz à effet de serre autres que le CO₂
+      "EN.ATM.GHGO.KT.CE"
     );
     return data;
   } catch (error) {
@@ -78,27 +81,26 @@ export const getGreenhouseGasEmissions = async (countryCode: string) => {
   }
 };
 
-export const getMethaneEmissions = async (countryCode: string) => {
+export const getMethaneEmissions = async (countryCode: string): Promise<number | null> => {
   const data = await getLatestValidEconomicData(
     countryCode,
     "EN.ATM.METH.AG.KT.CE"
   );
-  console.log("Methane Emissions Data:", data);
   return data;
 };
 
-export const getCO2EmissionsTotal = (countryCode: string) => {
+export const getCO2EmissionsTotal = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "EN.ATM.CO2E.KT");
 };
 
-export const getAgriculturalLandUse = (countryCode: string) => {
+export const getAgriculturalLandUse = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "AG.LND.AGRI.ZS");
 };
 
-export const getRenewableEnergyUse = (countryCode: string) => {
+export const getRenewableEnergyUse = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "EG.FEC.RNEW.ZS");
 };
 
-export const getGreenhouseGasEmissionsTotal = (countryCode: string) => {
+export const getGreenhouseGasEmissionsTotal = (countryCode: string): Promise<number | null> => {
   return getLatestValidEconomicData(countryCode, "EN.ATM.GHGO.KT.CE");
 };

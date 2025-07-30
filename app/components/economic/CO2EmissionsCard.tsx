@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Spinner from '../../components/Spinner';
 import { fetchEconomicData } from '../../services/EconomicDataFetcher';
+import { WorldBankDataPoint } from '../../types/economicTypes';
 
 interface CO2EmissionsPerCapitaCellProps {
 	countryCode: string;
@@ -22,7 +23,7 @@ const CO2EmissionsPerCapitaCell: React.FC<CO2EmissionsPerCapitaCellProps> = ({
 			try {
 				const result = await fetchEconomicData(countryCode, 'EN.ATM.CO2E.PC');
 				const latestValidValue = result.find(
-					(entry: { value: null }) => entry.value !== null
+					(entry: WorldBankDataPoint) => entry.value !== null
 				);
 
 				if (latestValidValue) {
