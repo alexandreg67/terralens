@@ -58,13 +58,13 @@ class Logger {
     this.log('warn', message, context);
   }
 
-  error(message: string, error?: Error, context?: LogContext): void {
-    const errorContext = error ? {
+  error(message: string, err?: Error, context?: LogContext): void {
+    const errorContext = err ? {
       ...context,
       error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
       }
     } : context;
 
