@@ -35,10 +35,10 @@ const formatYAxis = (tickItem: number) => {
 
 const GDPChart: React.FC<GDPChartProps> = ({
 	data,
-	lineColors = ['#8884d8', '#82ca9d', '#ff7300'], // Couleurs par défaut pour plusieurs lignes
+	lineColors = ['#2C7A7B', '#E53E3E', '#3182CE'], // Couleurs du thème terralens (primary, accent, info)
 	width = '100%',
 	height = 300,
-	gridColor = '#ccc',
+	gridColor = '#E2E8F0', // base-300 du thème pour la grille
 }) => {
 	if (!data || data.length === 0) {
 		return <p>No data available for the selected period.</p>;
@@ -63,14 +63,14 @@ const GDPChart: React.FC<GDPChartProps> = ({
 
 	return (
 		<div
-			className="p-4 bg-white dark:bg-gray-800 shadow rounded-lg"
+			className="p-4 bg-base-100 shadow rounded-lg"
 			aria-label="GDP Chart over Time"
 		>
-			<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-				<strong>X-Axis:</strong> Years (e.g., 2000, 2005, 2010)
+			<p className="text-sm text-base-content/70 mb-4">
+				<strong>Axe X :</strong> Années (ex: 2000, 2005, 2010)
 				<br />
-				<strong>Y-Axis:</strong> GDP in trillions (T), billions (B), or millions
-				(M) of USD.
+				<strong>Axe Y :</strong> PIB en trillions (T), milliards (B), ou millions
+				(M) de USD.
 			</p>
 			<ResponsiveContainer width={width} height={height}>
 				<LineChart
@@ -83,10 +83,27 @@ const GDPChart: React.FC<GDPChartProps> = ({
 					}}
 				>
 					<CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-					<XAxis dataKey="year" />
-					<YAxis tickFormatter={formatYAxis} />
-					<Tooltip />
-					<Legend />
+					<XAxis 
+						dataKey="year" 
+						stroke="#1A202C"
+						tick={{ fill: '#1A202C' }}
+					/>
+					<YAxis 
+						tickFormatter={formatYAxis} 
+						stroke="#1A202C"
+						tick={{ fill: '#1A202C' }}
+					/>
+					<Tooltip 
+						contentStyle={{
+							backgroundColor: '#F7FAFC',
+							border: '1px solid #E2E8F0',
+							borderRadius: '8px',
+							color: '#1A202C'
+						}}
+					/>
+					<Legend 
+						wrapperStyle={{ color: '#1A202C' }}
+					/>
 					{data.map((countryData, index) => (
 						<Line
 							key={countryData.country}
