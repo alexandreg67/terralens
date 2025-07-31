@@ -131,11 +131,6 @@ const WeatherPage: React.FC = () => {
 		}
 	}, []);
 
-	useEffect(() => {
-		if (weatherData) {
-			scrollToChart();
-		}
-	}, [weatherData, scrollToChart]);
 
 	return (
 		<div className="p-8 bg-background min-h-screen">
