@@ -97,7 +97,7 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 				</div>
 				<div className="stat bg-base-200 rounded-lg text-center">
 					<div className="stat-title">Sunset</div>
-					<div className="stat-value text-orange-500 text-2xl">{sunset}</div>
+					<div className="stat-value text-warning text-2xl">{sunset}</div>
 				</div>
 			</div>
 			<div className="grid grid-cols-2 gap-4 mb-6">

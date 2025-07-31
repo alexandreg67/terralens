@@ -52,8 +52,15 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		if (updatedSelection.length <= 3) {
 			onCountryChange(updatedSelection);
 		} else {
-			// Limit reached - the UI already shows a warning visually
-			// No need for console warning as it's handled by the alert component
+			// Limit reached - provide accessible feedback for screen readers
+			const liveRegion = document.getElementById('country-limit-live-region');
+			if (liveRegion) {
+				liveRegion.textContent = '3 country limit reached. Deselect a country to choose another.';
+				// Clear the message after 3 seconds
+				setTimeout(() => {
+					if (liveRegion) liveRegion.textContent = '';
+				}, 3000);
+			}
 			return;
 		}
 	};
@@ -93,6 +100,14 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 					</div>
 				))}
 			</div>
+			
+			{/* Live region for screen reader accessibility */}
+			<div 
+				id="country-limit-live-region" 
+				aria-live="polite" 
+				aria-atomic="true"
+				className="sr-only"
+			></div>
 		</div>
 	);
 };

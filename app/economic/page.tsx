@@ -26,6 +26,7 @@ const EconomicPage = () => {
   >([]);
   const [minYear, setMinYear] = useState<number | null>(null);
   const [maxYear, setMaxYear] = useState<number | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   interface CO2Data {
     country: string;
@@ -98,8 +99,6 @@ const EconomicPage = () => {
     fetchGdpData(selectedCountries);
     // fetchCo2Data(selectedCountries);
   }, [selectedCountries]);
-
-  const [dateError, setDateError] = useState<string | null>(null);
 
   const handleApplyFilters = () => {
     // Validate date ranges

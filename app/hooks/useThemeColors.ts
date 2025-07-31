@@ -56,19 +56,28 @@ export const useThemeColors = (): ThemeColors => {
         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
       };
 
-      setColors({
-        primary: hslToHex(computedStyle.getPropertyValue('--p').trim()) || defaultColors.primary,
-        secondary: hslToHex(computedStyle.getPropertyValue('--s').trim()) || defaultColors.secondary,
-        accent: hslToHex(computedStyle.getPropertyValue('--a').trim()) || defaultColors.accent,
-        neutral: hslToHex(computedStyle.getPropertyValue('--n').trim()) || defaultColors.neutral,
-        base100: hslToHex(computedStyle.getPropertyValue('--b1').trim()) || defaultColors.base100,
-        base200: hslToHex(computedStyle.getPropertyValue('--b2').trim()) || defaultColors.base200,
-        base300: hslToHex(computedStyle.getPropertyValue('--b3').trim()) || defaultColors.base300,
-        info: hslToHex(computedStyle.getPropertyValue('--in').trim()) || defaultColors.info,
-        success: hslToHex(computedStyle.getPropertyValue('--su').trim()) || defaultColors.success,
-        warning: hslToHex(computedStyle.getPropertyValue('--wa').trim()) || defaultColors.warning,
-        error: hslToHex(computedStyle.getPropertyValue('--er').trim()) || defaultColors.error,
-      });
+      // Optimize by reducing multiple getPropertyValue calls
+      const cssVariables = [
+        { key: 'primary', variable: '--p' },
+        { key: 'secondary', variable: '--s' },
+        { key: 'accent', variable: '--a' },
+        { key: 'neutral', variable: '--n' },
+        { key: 'base100', variable: '--b1' },
+        { key: 'base200', variable: '--b2' },
+        { key: 'base300', variable: '--b3' },
+        { key: 'info', variable: '--in' },
+        { key: 'success', variable: '--su' },
+        { key: 'warning', variable: '--wa' },
+        { key: 'error', variable: '--er' },
+      ] as const;
+
+      const newColors = cssVariables.reduce((acc, { key, variable }) => {
+        const hslValue = computedStyle.getPropertyValue(variable).trim();
+        acc[key as keyof ThemeColors] = hslToHex(hslValue) || defaultColors[key as keyof ThemeColors];
+        return acc;
+      }, {} as ThemeColors);
+
+      setColors(newColors);
     }
   }, []);
 
