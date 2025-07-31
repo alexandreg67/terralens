@@ -24,38 +24,38 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 		}
 	};
 
-	const buttonClasses = loading
-		? 'bg-gray-400'
-		: 'bg-primary text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50';
-
 	return (
 		<div>
-			<div className="flex justify-center mb-8">
-				<input
-					type="text"
-					value={cityInputValue}
-					onChange={onCityChange}
-					onKeyPress={handleKeyPress}
-					placeholder="Enter city"
-					className="p-2 border rounded"
-					aria-label="Enter a city name to get weather data"
-				/>
+			<div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+				<div className="form-control w-full max-w-md">
+					<input
+						type="text"
+						value={cityInputValue}
+						onChange={onCityChange}
+						onKeyPress={handleKeyPress}
+						placeholder="Enter city name (e.g., Paris, London)"
+						className="input input-bordered input-primary w-full focus:input-primary"
+						aria-label="Enter a city name to get weather data"
+					/>
+				</div>
 				<button
 					onClick={onSearchClick}
 					disabled={loading}
-					className={`ml-2 p-2 rounded ${buttonClasses}`}
+					className={`btn btn-primary ${loading ? 'loading' : ''}`}
 					aria-label="Search for weather data for the specified city"
-					role="button"
 				>
-					{loading ? <Spinner /> : 'Search'}
+					{loading ? 'Searching...' : 'Search'}
 				</button>
 			</div>
 
 			{error && (
-				<div className="text-center mb-8">
-					<p className="text-xl text-accent" role="alert">
-						{error}
-					</p>
+				<div className="alert alert-error mt-4">
+					<div>
+						<svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
+						<span role="alert">{error}</span>
+					</div>
 				</div>
 			)}
 		</div>

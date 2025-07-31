@@ -12,6 +12,7 @@ import {
 	Filler,
 } from 'chart.js';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 ChartJS.register(
 	CategoryScale,
@@ -31,7 +32,9 @@ interface WeatherOverviewChartProps {
 const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 	weatherData,
 }) => {
-	// Utilisation de useMemo pour optimiser les calculs des moyennes
+	const themeColors = useThemeColors();
+	
+	// Use useMemo to optimize average calculations
 	const { labels, averageTemperature, averageWindSpeed, averageHumidity } =
 		useMemo(() => {
 			const labels = Object.keys(weatherData);
@@ -53,80 +56,90 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 			return { labels, averageTemperature, averageWindSpeed, averageHumidity };
 		}, [weatherData]);
 
-	const chartData = {
+	const chartData = useMemo(() => ({
 		labels,
 		datasets: [
 			{
 				label: 'Average Temperature (°C)',
 				data: averageTemperature,
-				borderColor: '#2C7A7B',
-				backgroundColor: 'rgba(44, 122, 123, 0.2)',
+				borderColor: themeColors.primary,
+				backgroundColor: themeColors.primary + '33', // 20% opacity
 				fill: true,
 				tension: 0.3,
 			},
 			{
 				label: 'Average Wind Speed (m/s)',
 				data: averageWindSpeed,
-				borderColor: '#E53E3E',
-				backgroundColor: 'rgba(229, 62, 62, 0.2)',
+				borderColor: themeColors.accent,
+				backgroundColor: themeColors.accent + '33', // 20% opacity
 				fill: true,
 				tension: 0.3,
 			},
 			{
 				label: 'Average Humidity (%)',
 				data: averageHumidity,
-				borderColor: '#1A202C',
-				backgroundColor: 'rgba(26, 32, 44, 0.2)',
+				borderColor: themeColors.info,
+				backgroundColor: themeColors.info + '33', // 20% opacity
 				fill: true,
 				tension: 0.3,
 			},
 		],
-	};
+	}), [labels, averageTemperature, averageWindSpeed, averageHumidity, themeColors]);
 
-	const options = {
+	const options = useMemo(() => ({
 		responsive: true,
 		maintainAspectRatio: false,
 		plugins: {
 			legend: {
 				position: 'top' as const,
 				labels: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 			},
 			tooltip: {
-				backgroundColor: '#1A202C',
-				titleColor: '#F7FAFC',
-				bodyColor: '#F7FAFC',
-				cornerRadius: 4,
+				backgroundColor: themeColors.base100,
+				titleColor: themeColors.secondary,
+				bodyColor: themeColors.secondary,
+				borderColor: themeColors.base300,
+				borderWidth: 1,
+				cornerRadius: 8,
 			},
 		},
 		scales: {
 			x: {
 				ticks: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 				grid: {
-					color: 'rgba(26, 32, 44, 0.1)',
+					color: themeColors.base300,
 				},
 			},
 			y: {
 				ticks: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 				grid: {
-					color: 'rgba(26, 32, 44, 0.1)',
+					color: themeColors.base300,
 				},
 			},
 		},
-	};
+	}), [themeColors]);
 
 	return (
 		<div
-			className="w-full h-64 md:h-96 mb-8"
-			role="img"
+			className="p-4 bg-base-100 shadow rounded-lg"
 			aria-label="Weather overview chart showing average temperature, wind speed, and humidity over time"
 		>
-			<Line data={chartData} options={options} />
+			<p className="text-sm text-base-content/70 mb-4">
+				<strong>Temperature:</strong> Daily average in Celsius
+				<br />
+				<strong>Wind Speed:</strong> Average wind speed in m/s
+				<br />
+				<strong>Humidity:</strong> Average relative humidity percentage
+			</p>
+			<div className="w-full h-64 md:h-96">
+				<Line data={chartData} options={options} />
+			</div>
 		</div>
 	);
 };

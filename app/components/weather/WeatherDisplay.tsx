@@ -48,7 +48,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
 				<WeatherCard
 					key={date}
 					date={date}
-					data={temps.slice(0, 3)} // Montre seulement les 3 premières heures futures dans la carte
+					data={temps.slice(0, 3)} // Show only the first 3 future hours in the card
 					onOpenModal={onOpenModal}
 				/>
 			))}

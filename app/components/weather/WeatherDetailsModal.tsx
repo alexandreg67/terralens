@@ -20,7 +20,7 @@ const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
 	onClose,
 	city,
 }) => {
-	// Fermeture de la modal en appuyant sur la touche Échap
+	// Close modal on Escape key press
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
@@ -40,26 +40,28 @@ const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
 	if (!isOpen) return null;
 
 	return (
-		<div
-			className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300 ${
-				isOpen ? 'opacity-100' : 'opacity-0'
-			}`}
-			role="dialog"
-			aria-modal="true"
-			aria-labelledby="modal-title"
-		>
-			<div className="bg-white p-8 rounded-lg shadow-md max-w-xl w-full max-h-full overflow-y-auto">
-				<h2 id="modal-title" className="text-xl font-semibold mb-4">
-					Weather Details for {date}
-				</h2>
+		<div className={`modal ${isOpen ? 'modal-open' : ''}`}>
+			<div className="modal-box w-11/12 max-w-2xl" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+				<div className="flex justify-between items-center mb-6">
+					<h2 id="modal-title" className="text-2xl font-bold text-primary">
+						Weather Details for {date}
+					</h2>
+					<button
+						onClick={onClose}
+						className="btn btn-sm btn-circle btn-ghost"
+						aria-label="Close modal"
+					>
+						✕
+					</button>
+				</div>
 				<WeatherModalContent city={city} data={data} date={date} />
-				<button
-					onClick={onClose}
-					className="mt-6 w-full bg-primary text-white py-2 rounded-lg hover:bg-primary-dark"
-				>
-					Close
-				</button>
+				<div className="modal-action">
+					<button onClick={onClose} className="btn btn-primary">
+						Close
+					</button>
+				</div>
 			</div>
+			<div className="modal-backdrop" onClick={onClose}></div>
 		</div>
 	);
 };
