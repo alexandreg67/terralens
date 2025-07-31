@@ -126,10 +126,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 	}), [themeColors]);
 
 	return (
-		<div
-			className="p-4 bg-base-100 shadow rounded-lg"
-			aria-label="Weather overview chart showing average temperature, wind speed, and humidity over time"
-		>
+		<div aria-label="Weather overview chart showing average temperature, wind speed, and humidity over time">
 			<p className="text-sm text-base-content/70 mb-4">
 				<strong>Temperature:</strong> Daily average in Celsius
 				<br />

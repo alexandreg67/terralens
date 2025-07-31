@@ -43,9 +43,11 @@ const WeatherDetailsModal: React.FC<WeatherDetailsModalProps> = ({
 		<div className={`modal ${isOpen ? 'modal-open' : ''}`}>
 			<div className="modal-box w-11/12 max-w-2xl" role="dialog" aria-modal="true" aria-labelledby="modal-title">
 				<div className="flex justify-between items-center mb-6">
-					<h2 id="modal-title" className="text-2xl font-bold text-primary">
-						Weather Details for {date}
-					</h2>
+					<div className="flex-1">
+						<h2 id="modal-title" className="text-2xl font-bold text-primary text-center">
+							Weather Details for {date}
+						</h2>
+					</div>
 					<button
 						onClick={onClose}
 						className="btn btn-sm btn-circle btn-ghost"

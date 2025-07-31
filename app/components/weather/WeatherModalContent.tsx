@@ -90,9 +90,6 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 
 	return (
 		<div>
-			<h3 className="text-2xl font-semibold mb-4 text-center text-primary">
-				{date}
-			</h3>
 			<div className="grid grid-cols-2 gap-4 mb-6">
 				<div className="stat bg-base-200 rounded-lg text-center">
 					<div className="stat-title">Sunrise</div>
