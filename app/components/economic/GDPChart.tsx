@@ -10,6 +10,7 @@ import {
 	ResponsiveContainer,
 } from 'recharts';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { calculateRechartsYAxisDomain } from '../../utils/chartUtils';
 
 interface GDPChartProps {
 	data: Array<{
@@ -68,6 +69,10 @@ const GDPChart: React.FC<GDPChartProps> = ({
 		return yearData;
 	});
 
+	// Calculate adaptive Y-axis domain for better curve visibility
+	const countryKeys = data.map(countryData => countryData.country);
+	const yAxisConfig = calculateRechartsYAxisDomain(combinedData, countryKeys);
+
 	return (
 		<div
 			className="p-4 bg-base-100 shadow rounded-lg"
@@ -99,6 +104,7 @@ const GDPChart: React.FC<GDPChartProps> = ({
 						tickFormatter={formatYAxis} 
 						stroke={themeColors.secondary}
 						tick={{ fill: themeColors.secondary }}
+						domain={yAxisConfig.domain}
 					/>
 					<Tooltip 
 						contentStyle={{
