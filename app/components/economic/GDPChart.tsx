@@ -15,10 +15,10 @@ interface GDPChartProps {
 		country: string;
 		data: Array<{ year: string; value: number }>;
 	}>;
-	lineColors?: string[]; // Option pour personnaliser les couleurs des lignes
-	width?: number | string; // Option pour personnaliser la largeur du conteneur
-	height?: number; // Option pour personnaliser la hauteur du conteneur
-	gridColor?: string; // Option pour personnaliser la couleur de la grille
+	lineColors?: string[]; // Option to customize line colors
+	width?: number | string; // Option to customize container width
+	height?: number; // Option to customize container height
+	gridColor?: string; // Option to customize grid color
 }
 
 const formatYAxis = (tickItem: number) => {
@@ -29,27 +29,27 @@ const formatYAxis = (tickItem: number) => {
 	} else if (tickItem >= 1e6) {
 		return `${(tickItem / 1e6).toFixed(1)}M`; // Millions
 	} else {
-		return tickItem.toString(); // Valeurs plus petites
+		return tickItem.toString(); // Smaller values
 	}
 };
 
 const GDPChart: React.FC<GDPChartProps> = ({
 	data,
-	lineColors = ['#2C7A7B', '#E53E3E', '#3182CE'], // Couleurs du thème terralens (primary, accent, info)
+	lineColors = ['#2C7A7B', '#E53E3E', '#3182CE'], // Terralens theme colors (primary, accent, info)
 	width = '100%',
 	height = 300,
-	gridColor = '#E2E8F0', // base-300 du thème pour la grille
+	gridColor = '#E2E8F0', // base-300 theme color for grid
 }) => {
 	if (!data || data.length === 0) {
 		return <p>No data available for the selected period.</p>;
 	}
 
-	// Rassembler les années uniques
+	// Gather unique years
 	const allYears = Array.from(
 		new Set(data.flatMap((countryData) => countryData.data.map((d) => d.year)))
 	).sort();
 
-	// Fusionner les données en un seul tableau
+	// Merge data into a single array
 	const combinedData = allYears.map((year) => {
 		const yearData: { [key: string]: string | number } = { year };
 		data.forEach((countryData) => {
@@ -67,14 +67,14 @@ const GDPChart: React.FC<GDPChartProps> = ({
 			aria-label="GDP Chart over Time"
 		>
 			<p className="text-sm text-base-content/70 mb-4">
-				<strong>Axe X :</strong> Années (ex: 2000, 2005, 2010)
+				<strong>X-Axis:</strong> Years (e.g., 2000, 2005, 2010)
 				<br />
-				<strong>Axe Y :</strong> PIB en trillions (T), milliards (B), ou millions
-				(M) de USD.
+				<strong>Y-Axis:</strong> GDP in trillions (T), billions (B), or millions
+				(M) USD.
 			</p>
 			<ResponsiveContainer width={width} height={height}>
 				<LineChart
-					data={combinedData} // Utiliser les données combinées
+					data={combinedData} // Use combined data
 					margin={{
 						top: 5,
 						right: 30,

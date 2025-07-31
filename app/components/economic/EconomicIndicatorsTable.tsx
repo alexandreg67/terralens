@@ -17,7 +17,7 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Définition du tableau `indicators` dans le même fichier
+  // Definition of the `indicators` array in the same file
   const indicators = React.useMemo(
     () => [
       {
@@ -133,7 +133,7 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
         <thead>
           <tr>
             <th className="text-left text-secondary">
-              Indicateur
+              Indicator
             </th>
             {selectedCountries.map((countryCode) => (
               <th
@@ -170,10 +170,10 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
                         )}
                       </span>
                     ) : (
-                      <span className="text-error font-medium">Erreur</span>
+                      <span className="text-error font-medium">Error</span>
                     )
                   ) : (
-                    <span className="text-base-content/50">Pas de données</span>
+                    <span className="text-base-content/50">No data</span>
                   )}
                 </td>
               ))}

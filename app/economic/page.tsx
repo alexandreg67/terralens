@@ -32,7 +32,7 @@ const EconomicPage = () => {
     co2Emissions: number | null;
   }
   useEffect(() => {
-    // Calcule les années min et max une fois que les données sont chargées
+    // Calculate min and max years once data is loaded
     if (gdpData.length > 0) {
       const allYears = gdpData.flatMap((countryData) =>
         countryData.data.map((d: { year: any }) => d.year)
@@ -42,9 +42,9 @@ const EconomicPage = () => {
     }
   }, [gdpData]);
 
-  // Fonction pour filtrer les données du PIB en fonction des dates
+  // Function to filter GDP data based on dates
   const filterGdpData = (data: any[]) => {
-    if (!startYear || !endYear) return data; // Pas de filtre si les dates ne sont pas définies
+    if (!startYear || !endYear) return data; // No filter if dates are not defined
 
     return data.map((countryData) => ({
       ...countryData,
@@ -71,7 +71,7 @@ const EconomicPage = () => {
   };
 
   useEffect(() => {
-    // Calcule les années min et max une fois que les données sont chargées
+    // Calculate min and max years once data is loaded
     if (gdpData.length > 0) {
       const allYears = gdpData.flatMap((countryData) =>
         countryData.data.map((d: { year: any }) => d.year)
@@ -79,7 +79,7 @@ const EconomicPage = () => {
       setMinYear(Math.min(...allYears));
       setMaxYear(Math.max(...allYears));
 
-      // Initialise filteredGdpData avec toutes les données au chargement initial
+      // Initialize filteredGdpData with all data on initial load
       setFilteredGdpData(gdpData);
     }
   }, [gdpData]);
@@ -88,10 +88,10 @@ const EconomicPage = () => {
     const data = await Promise.all(
       countryCodes.map(async (code) => {
         const co2PerCapita = await getCO2EmissionsPerCapita(code);
-        return { country: code, co2Emissions: co2PerCapita }; // Structurez bien les données
+        return { country: code, co2Emissions: co2PerCapita }; // Structure the data properly
       })
     );
-    setCo2Data(data); // Mettre à jour l'état avec les données CO2
+    setCo2Data(data); // Update state with CO2 data
   };
 
   useEffect(() => {
@@ -100,13 +100,13 @@ const EconomicPage = () => {
   }, [selectedCountries]);
 
   const handleApplyFilters = () => {
-    // Vérification de la validité des dates
+    // Validate date ranges
     if (startYear && endYear && startYear > endYear) {
-      alert("L'année de début doit être inférieure ou égale à l'année de fin.");
-      return; // Empêche la mise à jour du graphique si les dates sont invalides
+      alert("Start year must be less than or equal to end year.");
+      return; // Prevent chart update if dates are invalid
     }
 
-    // Met à jour l'état avec les données filtrées
+    // Update state with filtered data
     setFilteredGdpData(filterGdpData(gdpData));
   };
 
@@ -114,25 +114,25 @@ const EconomicPage = () => {
     <div className="container mx-auto px-4 py-8 bg-base-100 min-h-screen">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-primary mb-4">
-          Module Économique
+          Economic Module
         </h1>
         <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
-          Analysez et comparez les indicateurs économiques des différents pays du monde.
-          Ce tableau de bord fournit une vue comparative des principaux indicateurs
-          économiques entre les pays sélectionnés.
+          Analyze and compare economic indicators of different countries around the world.
+          This dashboard provides a comparative overview of key economic indicators
+          across selected countries.
         </p>
       </div>
       
       <div className="max-w-6xl mx-auto">
-        {/* Sélecteur de pays */}
+        {/* Country selector */}
         <div className="card bg-base-200 shadow-xl mb-8">
           <div className="card-body">
             <h2 className="card-title text-secondary mb-4">
-              Sélection des pays à analyser
+              Country Selection for Analysis
             </h2>
             <p className="text-base-content/70 mb-4">
-              Vous pouvez comparer jusqu&apos;à 3 pays à la fois pour comprendre leurs performances
-              économiques et environnementales.
+              You can compare up to 3 countries at a time to understand their economic
+              and environmental performance.
             </p>
             <CountrySelector
               selectedCountries={selectedCountries}
@@ -140,25 +140,25 @@ const EconomicPage = () => {
             />
           </div>
         </div>
-        {/* Section PIB */}
+        {/* GDP section */}
         <div className="card bg-base-200 shadow-xl mb-8">
           <div className="card-body">
             <h2 className="card-title text-secondary mb-4">
-              Évolution du PIB dans le temps
+              GDP Evolution Over Time
             </h2>
             <p className="text-base-content/70 mb-6">
-              Le graphique ci-dessous illustre le Produit Intérieur Brut (PIB) des
-              pays sélectionnés au fil du temps, fournissant des informations sur leur croissance
-              et développement économique. L&apos;axe X représente les années, tandis que
-              l&apos;axe Y affiche les valeurs du PIB en trillions (T), milliards (B), ou
-              millions (M) de USD.
+              The chart below illustrates the Gross Domestic Product (GDP) of
+              selected countries over time, providing insights into their economic growth
+              and development. The X-axis represents the years, while the
+              Y-axis displays GDP values in trillions (T), billions (B), or
+              millions (M) USD.
             </p>
 
-            {/* Filtres de date */}
+            {/* Date filters */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="form-control">
                 <label className="label" htmlFor="startYear">
-                  <span className="label-text">Année de début</span>
+                  <span className="label-text">Start Year</span>
                 </label>
                 <input
                   type="number"
@@ -173,7 +173,7 @@ const EconomicPage = () => {
 
               <div className="form-control">
                 <label className="label" htmlFor="endYear">
-                  <span className="label-text">Année de fin</span>
+                  <span className="label-text">End Year</span>
                 </label>
                 <input
                   type="number"
@@ -188,18 +188,18 @@ const EconomicPage = () => {
 
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Appliquer les filtres</span>
+                  <span className="label-text">Apply Filters</span>
                 </label>
                 <button
                   onClick={handleApplyFilters}
                   className="btn btn-primary"
                 >
-                  Appliquer
+                  Apply
                 </button>
               </div>
             </div>
 
-            {/* Graphique PIB */}
+            {/* GDP Chart */}
             <GDPChart data={filteredGdpData} />
           </div>
         </div>
@@ -217,17 +217,17 @@ const EconomicPage = () => {
         <CO2ComparisonChart countryCodes={selectedCountries} />
       </div> */}
 
-        {/* Section indicateurs économiques */}
+        {/* Economic indicators section */}
         <div className="card bg-base-200 shadow-xl mb-8">
           <div className="card-body">
             <h2 className="card-title text-secondary mb-4">
-              Comparaison des indicateurs économiques clés
+              Key Economic Indicators Comparison
             </h2>
             <p className="text-base-content/70 mb-6">
-              Comparez les indicateurs économiques les plus importants entre les pays
-              sélectionnés pour obtenir des informations sur leurs performances économiques
-              et leur développement. Ce tableau met en évidence les métriques clés telles que
-              la croissance du PIB, les émissions de CO2 et les indices de développement humain.
+              Compare the most important economic indicators across selected
+              countries to gain insights into their economic performance and
+              development. This table highlights key metrics such as GDP growth,
+              CO2 emissions, and human development indices.
             </p>
             <EconomicIndicatorsTable selectedCountries={selectedCountries} />
           </div>

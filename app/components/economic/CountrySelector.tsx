@@ -2,9 +2,9 @@ import React from 'react';
 import { Country } from '../../types/economicTypes';
 
 interface CountrySelectorProps {
-	selectedCountries: string[]; // Tableau des pays sélectionnés
+	selectedCountries: string[]; // Array of selected countries
 	onCountryChange: (countryCodes: string[]) => void;
-	countries?: Country[]; // Utilisation de l'interface `Country`
+	countries?: Country[]; // Using the `Country` interface
 }
 
 const CountrySelector: React.FC<CountrySelectorProps> = ({
@@ -40,20 +40,20 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 	const handleCheckboxChange = (countryCode: string) => {
 		let updatedSelection;
 		if (selectedCountries.includes(countryCode)) {
-			// Retirer le pays s'il est déjà sélectionné
+			// Remove country if already selected
 			updatedSelection = selectedCountries.filter(
 				(country) => country !== countryCode
 			);
 		} else {
-			// Ajouter le pays s'il n'est pas encore sélectionné
+			// Add country if not yet selected
 			updatedSelection = [...selectedCountries, countryCode];
 		}
 
 		if (updatedSelection.length <= 3) {
 			onCountryChange(updatedSelection);
 		} else {
-			// Utiliser une approche plus élégante qu'alert
-			console.warn('Vous pouvez sélectionner au maximum 3 pays.');
+			// Use a more elegant approach than alert
+			console.warn('You can select up to 3 countries.');
 		}
 	};
 
@@ -61,7 +61,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		<div>
 			<div className="mb-4">
 				<p className="text-sm text-base-content/70 mb-2">
-					Sélectionnez jusqu&apos;à 3 pays pour la comparaison ({selectedCountries.length}/3)
+					Select up to 3 countries for comparison ({selectedCountries.length}/3)
 				</p>
 				{selectedCountries.length >= 3 && (
 					<div className="alert alert-warning mb-4">
@@ -69,7 +69,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 							<svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
 							</svg>
-							<span>Limite de 3 pays atteinte. Désélectionnez un pays pour en choisir un autre.</span>
+							<span>3 country limit reached. Deselect a country to choose another.</span>
 						</div>
 					</div>
 				)}
