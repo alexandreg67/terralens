@@ -99,13 +99,18 @@ const EconomicPage = () => {
     // fetchCo2Data(selectedCountries);
   }, [selectedCountries]);
 
+  const [dateError, setDateError] = useState<string | null>(null);
+
   const handleApplyFilters = () => {
     // Validate date ranges
     if (startYear && endYear && startYear > endYear) {
-      alert("Start year must be less than or equal to end year.");
+      setDateError("Start year must be less than or equal to end year.");
       return; // Prevent chart update if dates are invalid
     }
 
+    // Clear any previous errors
+    setDateError(null);
+    
     // Update state with filtered data
     setFilteredGdpData(filterGdpData(gdpData));
   };
@@ -155,6 +160,16 @@ const EconomicPage = () => {
             </p>
 
             {/* Date filters */}
+            {dateError && (
+              <div className="alert alert-error mb-4">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{dateError}</span>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="form-control">
                 <label className="label" htmlFor="startYear">
