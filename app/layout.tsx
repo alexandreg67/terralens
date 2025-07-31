@@ -25,10 +25,10 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="fr">
-			<body className={inter.className}>
+		<html lang="en" data-theme="terralens">
+			<body className={`${inter.className} antialiased bg-base-100 text-base-content`}>
 				<Header />
-				<main>
+				<main className="min-h-screen">
 					{children}
 				</main>
 				<Footer />

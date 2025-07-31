@@ -9,6 +9,7 @@ import {
 	Legend,
 	ResponsiveContainer,
 } from 'recharts';
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface GDPChartProps {
 	data: Array<{
@@ -35,11 +36,17 @@ const formatYAxis = (tickItem: number) => {
 
 const GDPChart: React.FC<GDPChartProps> = ({
 	data,
-	lineColors = ['#2C7A7B', '#E53E3E', '#3182CE'], // Terralens theme colors (primary, accent, info)
+	lineColors, // Will be set from theme colors
 	width = '100%',
 	height = 300,
-	gridColor = '#E2E8F0', // base-300 theme color for grid
+	gridColor, // Will be set from theme colors
 }) => {
+	const themeColors = useThemeColors();
+	
+	// Use theme colors as defaults if not provided
+	const chartLineColors = lineColors || [themeColors.primary, themeColors.accent, themeColors.info];
+	const chartGridColor = gridColor || themeColors.base300;
+
 	if (!data || data.length === 0) {
 		return <p>No data available for the selected period.</p>;
 	}
@@ -82,27 +89,27 @@ const GDPChart: React.FC<GDPChartProps> = ({
 						bottom: 5,
 					}}
 				>
-					<CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+					<CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
 					<XAxis 
 						dataKey="year" 
-						stroke="#1A202C"
-						tick={{ fill: '#1A202C' }}
+						stroke={themeColors.secondary}
+						tick={{ fill: themeColors.secondary }}
 					/>
 					<YAxis 
 						tickFormatter={formatYAxis} 
-						stroke="#1A202C"
-						tick={{ fill: '#1A202C' }}
+						stroke={themeColors.secondary}
+						tick={{ fill: themeColors.secondary }}
 					/>
 					<Tooltip 
 						contentStyle={{
-							backgroundColor: '#F7FAFC',
-							border: '1px solid #E2E8F0',
+							backgroundColor: themeColors.base100,
+							border: `1px solid ${themeColors.base300}`,
 							borderRadius: '8px',
-							color: '#1A202C'
+							color: themeColors.secondary
 						}}
 					/>
 					<Legend 
-						wrapperStyle={{ color: '#1A202C' }}
+						wrapperStyle={{ color: themeColors.secondary }}
 					/>
 					{data.map((countryData, index) => (
 						<Line
@@ -110,7 +117,7 @@ const GDPChart: React.FC<GDPChartProps> = ({
 							type="monotone"
 							dataKey={countryData.country}
 							name={countryData.country}
-							stroke={lineColors[index % lineColors.length]}
+							stroke={chartLineColors[index % chartLineColors.length]}
 							activeDot={{ r: 8 }}
 						/>
 					))}

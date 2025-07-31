@@ -1,40 +1,41 @@
-module.exports = {
-	content: [
-		'./pages/**/*.{js,ts,jsx,tsx,mdx}',
-		'./components/**/*.{js,ts,jsx,tsx,mdx}',
-		'./app/**/*.{js,ts,jsx,tsx,mdx}',
-	],
-	theme: {
-		extend: {
-			colors: {
-				primary: '#2C7A7B', // Bleu-vert pour les éléments principaux
-				secondary: '#1A202C', // Gris foncé pour les éléments secondaires
-				accent: '#E53E3E', // Rouge pour attirer l'attention sur les éléments importants
-				background: '#F7FAFC', // Couleur de fond claire
-			},
-			fontFamily: {
-				sans: ['Inter', 'sans-serif'], // Exemple de typographie
-			},
-		},
-	},
-	plugins: [
-		require('daisyui'), // Ajoute DaisyUI comme plugin
-	],
-	daisyui: {
-		themes: [
-			{
-				mytheme: {
-					primary: '#2C7A7B',
-					secondary: '#1A202C',
-					accent: '#E53E3E',
-					neutral: '#3D4451',
-					'base-100': '#FFFFFF',
-					info: '#3ABFF8',
-					success: '#36D399',
-					warning: '#FBBD23',
-					error: '#F87272',
-				},
-			},
-		],
-	},
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+      },
+    },
+  },
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      {
+        terralens: {
+          "primary": "#2C7A7B",
+          "secondary": "#1A202C", 
+          "accent": "#E53E3E",
+          "neutral": "#374151",
+          "base-100": "#F7FAFC",
+          "base-200": "#EDF2F7",
+          "base-300": "#E2E8F0",
+          "info": "#3182CE",
+          "success": "#38A169",
+          "warning": "#D69E2E",
+          "error": "#E53E3E",
+        },
+      },
+    ],
+    base: true,
+    styled: true,
+    utils: true,
+  },
 };
+export default config;
