@@ -52,8 +52,9 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		if (updatedSelection.length <= 3) {
 			onCountryChange(updatedSelection);
 		} else {
-			// Use a more elegant approach than alert
-			console.warn('You can select up to 3 countries.');
+			// Limit reached - the UI already shows a warning visually
+			// No need for console warning as it's handled by the alert component
+			return;
 		}
 	};
 
