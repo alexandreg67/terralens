@@ -78,6 +78,10 @@ const WeatherPage: React.FC = () => {
 		setSelectedDay('');
 	};
 
+	const clearError = () => {
+		setError(null);
+	};
+
 	const handleSearchClick = async () => {
 		setError(null);
 		if (cityInput.value.trim().length > 2) {
@@ -133,63 +137,91 @@ const WeatherPage: React.FC = () => {
 
 
 	return (
-		<div className="p-8 bg-background min-h-screen">
-			<h2 className="text-4xl font-bold text-center mb-8 text-primary">
-				Weather Data
-			</h2>
+		<div className="container mx-auto px-4 py-8 bg-base-100 min-h-screen">
+			<div className="text-center mb-12">
+				<h1 className="text-4xl font-bold text-primary mb-4">
+					Weather Module
+				</h1>
+				<p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+					Explore real-time weather data and forecasts for any location worldwide.
+					Get detailed insights into weather patterns and trends.
+				</p>
+			</div>
+			
+			<div className="max-w-6xl mx-auto">
 
-			<WeatherSearchBar
-				cityInputValue={cityInput.value}
-				onCityChange={cityInput.onChange}
-				onSearchClick={handleSearchClick}
-				onKeyPress={(e) => {
-					if (e.key === 'Enter') {
-						handleSearchClick();
-					}
-				}}
-				loading={loading}
-				error={error}
-			/>
-
-			{location.displayCity && (
-				<CityHeader
-					city={location.displayCity}
-					hasWeatherData={!!weatherData}
-					onScrollToChart={scrollToChart}
-				/>
-			)}
-
-			<WeatherDisplay
-				weatherData={weatherData}
-				onOpenModal={openModal}
-				loading={loading}
-				error={error}
-				displayCity={location.displayCity}
-			/>
-
-			<WeatherDetailsModal
-				date={selectedDay}
-				data={
-					selectedDay && allWeatherData?.[selectedDay]
-						? allWeatherData[selectedDay]
-						: []
-				}
-				isOpen={isModalOpen}
-				onClose={closeModal}
-				city={{
-					latitude: parseFloat(location.latitude),
-					longitude: parseFloat(location.longitude),
-				}}
-			/>
-
-			{weatherData && (
-				<div id="weather-chart" className="mt-12">
-					<h3 className="text-2xl font-bold text-center mb-4 text-secondary">
-						Weather Trends in {location.displayCity}
-					</h3>
-					<WeatherOverviewChart weatherData={weatherData} />
+				{/* Search section */}
+				<div className="card bg-base-200 shadow-xl mb-8">
+					<div className="card-body">
+						<h2 className="card-title text-secondary mb-4">
+							Location Search
+						</h2>
+						<p className="text-base-content/70 mb-4">
+							Enter a city name to get current weather conditions and forecasts.
+						</p>
+						<WeatherSearchBar
+							cityInputValue={cityInput.value}
+							onCityChange={cityInput.onChange}
+							onSearchClick={handleSearchClick}
+							onKeyPress={(e) => {
+								if (e.key === 'Enter') {
+									handleSearchClick();
+								}
+							}}
+							loading={loading}
+							error={error}
+							onClearError={clearError}
+						/>
+					</div>
 				</div>
-			)}
+
+				{location.displayCity && (
+					<CityHeader
+						city={location.displayCity}
+						hasWeatherData={!!weatherData}
+						onScrollToChart={scrollToChart}
+					/>
+				)}
+
+				<WeatherDisplay
+					weatherData={weatherData}
+					onOpenModal={openModal}
+					loading={loading}
+					error={error}
+					displayCity={location.displayCity}
+				/>
+
+				<WeatherDetailsModal
+					date={selectedDay}
+					data={
+						selectedDay && allWeatherData?.[selectedDay]
+							? allWeatherData[selectedDay]
+							: []
+					}
+					isOpen={isModalOpen}
+					onClose={closeModal}
+					city={{
+						latitude: parseFloat(location.latitude),
+						longitude: parseFloat(location.longitude),
+					}}
+				/>
+
+				{/* Weather trends section */}
+				{weatherData && (
+					<div className="card bg-base-200 shadow-xl mb-8">
+						<div className="card-body">
+							<h2 className="card-title text-secondary mb-4" id="weather-chart">
+								Weather Trends in {location.displayCity}
+							</h2>
+							<p className="text-base-content/70 mb-6">
+								Visual representation of weather patterns and trends over time.
+								Analyze temperature, humidity, and other meteorological data.
+							</p>
+							<WeatherOverviewChart weatherData={weatherData} />
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };

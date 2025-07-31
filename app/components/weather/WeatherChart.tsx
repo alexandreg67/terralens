@@ -11,6 +11,7 @@ import {
 	Legend,
 	Filler,
 } from 'chart.js';
+import { useThemeColors, hexToRgba } from '../../hooks/useThemeColors';
 
 ChartJS.register(
 	CategoryScale,
@@ -31,6 +32,8 @@ interface WeatherDataEntry {
 }
 
 const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
+	const themeColors = useThemeColors();
+	
 	const chartData = useMemo(
 		() => ({
 			labels: data.map((entry) => entry.time),
@@ -38,76 +41,79 @@ const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
 				{
 					label: 'Temperature (°C)',
 					data: data.map((entry) => entry.temperature),
-					borderColor: '#2C7A7B',
-					backgroundColor: 'rgba(44, 122, 123, 0.2)',
+					borderColor: themeColors.primary,
+					backgroundColor: hexToRgba(themeColors.primary, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
 				{
 					label: 'Wind Speed (m/s)',
 					data: data.map((entry) => entry.windSpeed),
-					borderColor: '#E53E3E',
-					backgroundColor: 'rgba(229, 62, 62, 0.2)',
+					borderColor: themeColors.accent,
+					backgroundColor: hexToRgba(themeColors.accent, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
 				{
 					label: 'Humidity (%)',
 					data: data.map((entry) => entry.humidity),
-					borderColor: '#1A202C',
-					backgroundColor: 'rgba(26, 32, 44, 0.2)',
+					borderColor: themeColors.info,
+					backgroundColor: hexToRgba(themeColors.info, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
 			],
 		}),
-		[data]
+		[data, themeColors]
 	);
 
-	const options = {
+	const options = useMemo(() => ({
 		responsive: true,
 		maintainAspectRatio: false,
 		plugins: {
 			legend: {
 				position: 'top' as const,
 				labels: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 			},
 			tooltip: {
-				backgroundColor: '#1A202C',
-				titleColor: '#F7FAFC',
-				bodyColor: '#F7FAFC',
-				cornerRadius: 4,
+				backgroundColor: themeColors.base100,
+				titleColor: themeColors.secondary,
+				bodyColor: themeColors.secondary,
+				borderColor: themeColors.base300,
+				borderWidth: 1,
+				cornerRadius: 8,
 			},
 		},
 		scales: {
 			x: {
 				ticks: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 				grid: {
-					color: 'rgba(26, 32, 44, 0.1)',
+					color: themeColors.base300,
 				},
 			},
 			y: {
 				ticks: {
-					color: '#1A202C',
+					color: themeColors.secondary,
 				},
 				grid: {
-					color: 'rgba(26, 32, 44, 0.1)',
+					color: themeColors.base300,
 				},
 			},
 		},
-	};
+	}), [themeColors]);
 
 	return (
 		<div
-			className="w-full h-64 md:h-96"
-			role="img"
+			className="p-4 bg-base-100 shadow rounded-lg"
 			aria-label="Weather data chart showing temperature, wind speed, and humidity over time"
 		>
-			<Line data={chartData} options={options} />
+			<div className="w-full h-64 md:h-96">
+				<Line data={chartData} options={options} />
+			</div>
 		</div>
 	);
 };

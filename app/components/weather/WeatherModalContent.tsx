@@ -90,26 +90,25 @@ const WeatherModalContent: React.FC<WeatherModalContentProps> = ({
 
 	return (
 		<div>
-			<h3 className="text-2xl font-semibold mb-4 text-center text-primary">
-				{date}
-			</h3>
-			<div className="flex justify-between mb-6">
-				<div className="text-center">
-					<h4 className="text-lg font-semibold text-primary">Sunrise</h4>
-					<p className="text-secondary">{sunrise}</p>
+			<div className="grid grid-cols-2 gap-4 mb-6">
+				<div className="stat bg-base-200 rounded-lg text-center">
+					<div className="stat-title">Sunrise</div>
+					<div className="stat-value text-warning text-2xl">{sunrise}</div>
 				</div>
-				<div className="text-center">
-					<h4 className="text-lg font-semibold text-primary">Sunset</h4>
-					<p className="text-secondary">{sunset}</p>
+				<div className="stat bg-base-200 rounded-lg text-center">
+					<div className="stat-title">Sunset</div>
+					<div className="stat-value text-warning text-2xl">{sunset}</div>
 				</div>
 			</div>
-			<div className="text-center mb-6">
-				<p className="text-lg">
-					<span className="font-semibold">Max Temperature :</span> {maxTemp}°C
-				</p>
-				<p className="text-lg">
-					<span className="font-semibold">Min Temperature :</span> {minTemp}°C
-				</p>
+			<div className="grid grid-cols-2 gap-4 mb-6">
+				<div className="stat bg-base-200 rounded-lg">
+					<div className="stat-title">Max Temperature</div>
+					<div className="stat-value text-accent">{maxTemp}°C</div>
+				</div>
+				<div className="stat bg-base-200 rounded-lg">
+					<div className="stat-title">Min Temperature</div>
+					<div className="stat-value text-info">{minTemp}°C</div>
+				</div>
 			</div>
 			<WeatherChart data={data} />
 		</div>

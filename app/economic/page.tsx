@@ -26,13 +26,14 @@ const EconomicPage = () => {
   >([]);
   const [minYear, setMinYear] = useState<number | null>(null);
   const [maxYear, setMaxYear] = useState<number | null>(null);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   interface CO2Data {
     country: string;
     co2Emissions: number | null;
   }
   useEffect(() => {
-    // Calcule les années min et max une fois que les données sont chargées
+    // Calculate min and max years once data is loaded
     if (gdpData.length > 0) {
       const allYears = gdpData.flatMap((countryData) =>
         countryData.data.map((d: { year: any }) => d.year)
@@ -42,9 +43,9 @@ const EconomicPage = () => {
     }
   }, [gdpData]);
 
-  // Fonction pour filtrer les données du PIB en fonction des dates
+  // Function to filter GDP data based on dates
   const filterGdpData = (data: any[]) => {
-    if (!startYear || !endYear) return data; // Pas de filtre si les dates ne sont pas définies
+    if (!startYear || !endYear) return data; // No filter if dates are not defined
 
     return data.map((countryData) => ({
       ...countryData,
@@ -71,7 +72,7 @@ const EconomicPage = () => {
   };
 
   useEffect(() => {
-    // Calcule les années min et max une fois que les données sont chargées
+    // Calculate min and max years once data is loaded
     if (gdpData.length > 0) {
       const allYears = gdpData.flatMap((countryData) =>
         countryData.data.map((d: { year: any }) => d.year)
@@ -79,7 +80,7 @@ const EconomicPage = () => {
       setMinYear(Math.min(...allYears));
       setMaxYear(Math.max(...allYears));
 
-      // Initialise filteredGdpData avec toutes les données au chargement initial
+      // Initialize filteredGdpData with all data on initial load
       setFilteredGdpData(gdpData);
     }
   }, [gdpData]);
@@ -88,10 +89,10 @@ const EconomicPage = () => {
     const data = await Promise.all(
       countryCodes.map(async (code) => {
         const co2PerCapita = await getCO2EmissionsPerCapita(code);
-        return { country: code, co2Emissions: co2PerCapita }; // Structurez bien les données
+        return { country: code, co2Emissions: co2PerCapita }; // Structure the data properly
       })
     );
-    setCo2Data(data); // Mettre à jour l'état avec les données CO2
+    setCo2Data(data); // Update state with CO2 data
   };
 
   useEffect(() => {
@@ -100,104 +101,122 @@ const EconomicPage = () => {
   }, [selectedCountries]);
 
   const handleApplyFilters = () => {
-    // Vérification de la validité des dates
+    // Validate date ranges
     if (startYear && endYear && startYear > endYear) {
-      alert("L'année de début doit être inférieure ou égale à l'année de fin.");
-      return; // Empêche la mise à jour du graphique si les dates sont invalides
+      setDateError("Start year must be less than or equal to end year.");
+      return; // Prevent chart update if dates are invalid
     }
 
-    // Met à jour l'état avec les données filtrées
+    // Clear any previous errors
+    setDateError(null);
+    
+    // Update state with filtered data
     setFilteredGdpData(filterGdpData(gdpData));
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-3xl font-semibold text-primary text-center">
-          Overview of Economic Performance
-        </h2>
-        <p className="text-gray-700 dark:text-gray-300 text-center">
-          This dashboard provides a comparative overview of key economic
-          indicators across selected countries. Understand how different nations
-          perform in terms of economic growth, environmental impact, and social
-          development.
-        </p>
-        <p className="text-gray-700 dark:text-gray-300 text-center">
-          You can compare up to 3 countries at a time to understand their
-          environmental performance. Higher emissions per capita often indicate
-          greater environmental pressures and less sustainable practices.
+    <div className="container mx-auto px-4 py-8 bg-base-100 min-h-screen">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-primary mb-4">
+          Economic Module
+        </h1>
+        <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+          Analyze and compare economic indicators of different countries around the world.
+          This dashboard provides a comparative overview of key economic indicators
+          across selected countries.
         </p>
       </div>
-      <div className="max-w-lg mx-auto mb-6">
-        <CountrySelector
-          selectedCountries={selectedCountries}
-          onCountryChange={handleCountryChange}
-        />
-      </div>
-      <div className="mb-6">
-        <h2 className="text-3xl font-semibold text-primary mb-4 text-center">
-          GDP Over Time
-        </h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
-          The chart below illustrates the Gross Domestic Product (GDP) of
-          selected countries over time, providing insights into their economic
-          growth and development. The X-axis represents the years, while the
-          Y-axis displays the GDP values in trillions (T), billions (B), or
-          millions (M) of USD. Analyze the trends to understand how the
-          economies of these countries have evolved over the years.
-        </p>
-
-        {/* Filtres de date avec saisie directe des années et limitation des valeurs */}
-        <div className="flex justify-center items-end mb-4 space-x-4">
-          <div>
-            <label
-              htmlFor="startYear"
-              className="block text-sm font-medium text-secondary"
-            >
-              {" "}
-              Start Year :
-            </label>
-            <input
-              type="number"
-              id="startYear"
-              value={startYear || ""}
-              onChange={(e) => setStartYear(parseInt(e.target.value) || null)}
-              min={minYear !== null ? minYear.toString() : undefined}
-              max={endYear?.toString()}
-              className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm" // Utilise focus:ring-primary et focus:border-primary
+      
+      <div className="max-w-6xl mx-auto">
+        {/* Country selector */}
+        <div className="card bg-base-200 shadow-xl mb-8">
+          <div className="card-body">
+            <h2 className="card-title text-secondary mb-4">
+              Country Selection for Analysis
+            </h2>
+            <p className="text-base-content/70 mb-4">
+              You can compare up to 3 countries at a time to understand their economic
+              and environmental performance.
+            </p>
+            <CountrySelector
+              selectedCountries={selectedCountries}
+              onCountryChange={handleCountryChange}
             />
           </div>
-
-          <div>
-            <label
-              htmlFor="endYear"
-              className="block text-sm font-medium text-secondary"
-            >
-              {" "}
-              End Year :
-            </label>
-            <input
-              type="number"
-              id="endYear"
-              value={endYear || ""}
-              onChange={(e) => setEndYear(parseInt(e.target.value) || null)}
-              min={startYear?.toString() || minYear?.toString()}
-              max={maxYear?.toString()}
-              className="mt-1 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm" // Utilise focus:ring-primary et focus:border-primary
-            />
-          </div>
-
-          <button
-            onClick={handleApplyFilters}
-            className="bg-primary hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-          >
-            Apply
-          </button>
         </div>
+        {/* GDP section */}
+        <div className="card bg-base-200 shadow-xl mb-8">
+          <div className="card-body">
+            <h2 className="card-title text-secondary mb-4">
+              GDP Evolution Over Time
+            </h2>
+            <p className="text-base-content/70 mb-6">
+              The chart below illustrates the Gross Domestic Product (GDP) of
+              selected countries over time, providing insights into their economic growth
+              and development. The X-axis represents the years, while the
+              Y-axis displays GDP values in trillions (T), billions (B), or
+              millions (M) USD.
+            </p>
 
-        {/* Utilise les données filtrées */}
-        <GDPChart data={filteredGdpData} />
-      </div>
+            {/* Date filters */}
+            {dateError && (
+              <div className="alert alert-error mb-4">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{dateError}</span>
+                </div>
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="form-control">
+                <label className="label" htmlFor="startYear">
+                  <span className="label-text">Start Year</span>
+                </label>
+                <input
+                  type="number"
+                  id="startYear"
+                  value={startYear || ""}
+                  onChange={(e) => setStartYear(parseInt(e.target.value) || null)}
+                  min={minYear !== null ? minYear.toString() : undefined}
+                  max={endYear?.toString()}
+                  className="input input-bordered focus:input-primary"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label" htmlFor="endYear">
+                  <span className="label-text">End Year</span>
+                </label>
+                <input
+                  type="number"
+                  id="endYear"
+                  value={endYear || ""}
+                  onChange={(e) => setEndYear(parseInt(e.target.value) || null)}
+                  min={startYear?.toString() || minYear?.toString()}
+                  max={maxYear?.toString()}
+                  className="input input-bordered focus:input-primary"
+                />
+              </div>
+
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Apply Filters</span>
+                </label>
+                <button
+                  onClick={handleApplyFilters}
+                  className="btn btn-primary"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            {/* GDP Chart */}
+            <GDPChart data={filteredGdpData} />
+          </div>
+        </div>
       {/* <div className="mb-6">
         <h2 className="text-3xl font-semibold text-primary mb-4 text-center">
           Environmental Impact Comparison
@@ -212,17 +231,21 @@ const EconomicPage = () => {
         <CO2ComparisonChart countryCodes={selectedCountries} />
       </div> */}
 
-      <div className="mb-6">
-        <h2 className="text-3xl font-semibold text-primary mb-4 text-center">
-          Key Economic Indicators Comparison
-        </h2>
-        <p className="text-gray-700 dark:text-gray-300 mb-4 text-center">
-          Compare the most important economic indicators across selected
-          countries to gain insights into their economic performance and
-          development. This table highlights key metrics such as GDP growth, CO2
-          emissions, and human development indices.
-        </p>
-        <EconomicIndicatorsTable selectedCountries={selectedCountries} />
+        {/* Economic indicators section */}
+        <div className="card bg-base-200 shadow-xl mb-8">
+          <div className="card-body">
+            <h2 className="card-title text-secondary mb-4">
+              Key Economic Indicators Comparison
+            </h2>
+            <p className="text-base-content/70 mb-6">
+              Compare the most important economic indicators across selected
+              countries to gain insights into their economic performance and
+              development. This table highlights key metrics such as GDP growth,
+              CO2 emissions, and human development indices.
+            </p>
+            <EconomicIndicatorsTable selectedCountries={selectedCountries} />
+          </div>
+        </div>
       </div>
     </div>
   );

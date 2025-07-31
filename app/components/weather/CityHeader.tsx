@@ -13,19 +13,22 @@ const CityHeader: React.FC<CityHeaderProps> = ({
 	onScrollToChart,
 }) => {
 	return (
-		<div className="text-center mb-8">
-			<h3 className="text-2xl font-semibold text-secondary">{city}</h3>
-			{hasWeatherData && (
-				<div className="mt-4">
-					<button
-						onClick={onScrollToChart}
-						aria-label={`See weather trends for ${city}`}
-						className="text-primary font-semibold underline hover:no-underline"
-					>
-						See Weather Trends for {city}
-					</button>
-				</div>
-			)}
+		<div className="card bg-base-200 shadow-xl mb-8">
+			<div className="card-body text-center">
+				<h3 className="card-title text-secondary justify-center text-3xl">{city}</h3>
+				<p className="text-base-content/70">Current weather data and forecasts</p>
+				{hasWeatherData && (
+					<div className="card-actions justify-center mt-4">
+						<button
+							onClick={onScrollToChart}
+							aria-label={`See weather trends for ${city}`}
+							className="btn btn-primary btn-sm"
+						>
+							View Weather Trends
+						</button>
+					</div>
+				)}
+			</div>
 		</div>
 	);
 };

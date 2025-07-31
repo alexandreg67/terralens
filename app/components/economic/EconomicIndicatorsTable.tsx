@@ -17,7 +17,7 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Définition du tableau `indicators` dans le même fichier
+  // Definition of the `indicators` array in the same file
   const indicators = React.useMemo(
     () => [
       {
@@ -115,21 +115,30 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
   }
 
   if (error) {
-    return <div className="text-red-600">{error}</div>;
+    return (
+      <div className="alert alert-error shadow-lg">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{error}</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="overflow-x-auto">
-      <table className="table w-full border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm">
-        <thead className="bg-gray-100 dark:bg-gray-800">
+      <table className="table table-zebra w-full">
+        <thead>
           <tr>
-            <th className="p-4 text-left text-gray-600 dark:text-gray-200">
+            <th className="text-left text-secondary">
               Indicator
             </th>
             {selectedCountries.map((countryCode) => (
               <th
                 key={countryCode}
-                className="p-4 text-left text-gray-600 dark:text-gray-200"
+                className="text-left text-secondary"
               >
                 {countryCode}
               </th>
@@ -138,33 +147,33 @@ const EconomicIndicatorsTable: React.FC<{ selectedCountries: string[] }> = ({
         </thead>
         <tbody>
           {indicators.map((indicator) => (
-            <tr
-              key={indicator.title}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <td className="p-4 font-semibold text-gray-700 dark:text-gray-300">
-                {indicator.title}
-                <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {indicator.description}
+            <tr key={indicator.title} className="hover">
+              <td className="font-semibold text-base-content">
+                <div className="flex flex-col">
+                  <span>{indicator.title}</span>
+                  <div className="text-sm text-base-content/70 max-w-md">
+                    {indicator.description}
+                  </div>
                 </div>
               </td>
               {selectedCountries.map((countryCode) => (
-                <td
-                  key={countryCode}
-                  className="p-4 text-gray-700 dark:text-gray-300"
-                >
+                <td key={countryCode} className="text-base-content">
                   {data[countryCode] &&
                   data[countryCode][indicator.title] !== undefined ? (
                     data[countryCode][indicator.title] !== "Error" ? (
-                      <span>
+                      <span className="font-medium">
                         {data[countryCode][indicator.title]?.toFixed(2)}{" "}
-                        {indicator.unit}
+                        {indicator.unit && (
+                          <span className="text-base-content/70">
+                            {indicator.unit}
+                          </span>
+                        )}
                       </span>
                     ) : (
-                      <span className="text-red-600">Error</span>
+                      <span className="text-error font-medium">Error</span>
                     )
                   ) : (
-                    <span className="text-gray-500">No data</span>
+                    <span className="text-base-content/50">No data</span>
                   )}
                 </td>
               ))}

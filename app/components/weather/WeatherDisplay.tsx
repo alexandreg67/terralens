@@ -40,7 +40,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
 
 	return (
 		<div
-			className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-500 ${
+			className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 transition-opacity duration-500 ${
 				loading ? 'opacity-0' : 'opacity-100'
 			}`}
 		>
@@ -48,7 +48,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({
 				<WeatherCard
 					key={date}
 					date={date}
-					data={temps.slice(0, 3)} // Montre seulement les 3 premières heures futures dans la carte
+					data={temps.slice(0, 3)} // Show only the first 3 future hours in the card
 					onOpenModal={onOpenModal}
 				/>
 			))}
