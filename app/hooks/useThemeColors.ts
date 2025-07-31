@@ -28,6 +28,26 @@ const defaultColors: ThemeColors = {
   error: '#E53E3E',
 };
 
+// HSL to hex conversion utility - moved outside component to avoid recreations
+const hslToHex = (hsl: string): string => {
+  if (!hsl || hsl === 'none') return '';
+  const values = hsl.split(' ').map(v => parseFloat(v));
+  if (values.length !== 3) return '';
+  const [h, s, l] = values;
+  const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l / 100 - c / 2;
+  let r, g, b;
+  if (h < 60) [r, g, b] = [c, x, 0];
+  else if (h < 120) [r, g, b] = [x, c, 0];
+  else if (h < 180) [r, g, b] = [0, c, x];
+  else if (h < 240) [r, g, b] = [0, x, c];
+  else if (h < 300) [r, g, b] = [x, 0, c];
+  else [r, g, b] = [c, 0, x];
+  const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
 export const useThemeColors = (): ThemeColors => {
   const [colors, setColors] = useState<ThemeColors>(defaultColors);
 
@@ -35,26 +55,6 @@ export const useThemeColors = (): ThemeColors => {
     if (typeof window !== 'undefined') {
       const root = document.documentElement;
       const computedStyle = getComputedStyle(root);
-
-      // Convert DaisyUI HSL values to hex for easier usage
-      const hslToHex = (hsl: string): string => {
-        if (!hsl || hsl === 'none') return '';
-        const values = hsl.split(' ').map(v => parseFloat(v));
-        if (values.length !== 3) return '';
-        const [h, s, l] = values;
-        const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
-        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        const m = l / 100 - c / 2;
-        let r, g, b;
-        if (h < 60) [r, g, b] = [c, x, 0];
-        else if (h < 120) [r, g, b] = [x, c, 0];
-        else if (h < 180) [r, g, b] = [0, c, x];
-        else if (h < 240) [r, g, b] = [0, x, c];
-        else if (h < 300) [r, g, b] = [x, 0, c];
-        else [r, g, b] = [c, 0, x];
-        const toHex = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
-        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-      };
 
       // Optimize by reducing multiple getPropertyValue calls
       const cssVariables = [
