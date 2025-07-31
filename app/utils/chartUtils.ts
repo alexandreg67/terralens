@@ -1,6 +1,39 @@
 /**
- * Chart utilities for adaptive Y-axis scaling
+ * Chart utilities for adaptive Y-axis scaling and color management
  */
+
+/**
+ * Extended color palette for charts with high contrast and visibility
+ * Supports up to 12 distinct datasets/countries
+ */
+export const CHART_COLOR_PALETTE = [
+  '#2563eb', // Blue
+  '#dc2626', // Red  
+  '#16a34a', // Green
+  '#ea580c', // Orange
+  '#9333ea', // Purple
+  '#0891b2', // Cyan
+  '#be123c', // Pink
+  '#65a30d', // Lime
+  '#0369a1', // Sky blue
+  '#dc2626', // Rose
+  '#854d0e', // Amber
+  '#374151', // Gray
+];
+
+/**
+ * Gets a color from the palette by index, cycling through if necessary
+ */
+export function getChartColor(index: number): string {
+  return CHART_COLOR_PALETTE[index % CHART_COLOR_PALETTE.length];
+}
+
+/**
+ * Generates an array of distinct colors for multiple datasets
+ */
+export function generateColorArray(count: number): string[] {
+  return Array.from({ length: count }, (_, index) => getChartColor(index));
+}
 
 export interface YAxisConfig {
   beginAtZero?: boolean;

@@ -10,7 +10,7 @@ import {
 	ResponsiveContainer,
 } from 'recharts';
 import { useThemeColors } from '../../hooks/useThemeColors';
-import { calculateRechartsYAxisDomain } from '../../utils/chartUtils';
+import { calculateRechartsYAxisDomain, generateColorArray } from '../../utils/chartUtils';
 
 interface GDPChartProps {
 	data: Array<{
@@ -44,8 +44,8 @@ const GDPChart: React.FC<GDPChartProps> = ({
 }) => {
 	const themeColors = useThemeColors();
 	
-	// Use theme colors as defaults if not provided
-	const chartLineColors = lineColors || [themeColors.primary, themeColors.accent, themeColors.info];
+	// Generate distinct colors for each country/dataset
+	const chartLineColors = lineColors || generateColorArray(data.length);
 	const chartGridColor = gridColor || themeColors.base300;
 
 	if (!data || data.length === 0) {
@@ -123,7 +123,7 @@ const GDPChart: React.FC<GDPChartProps> = ({
 							type="monotone"
 							dataKey={countryData.country}
 							name={countryData.country}
-							stroke={chartLineColors[index % chartLineColors.length]}
+							stroke={chartLineColors[index]}
 							activeDot={{ r: 8 }}
 						/>
 					))}
