@@ -12,7 +12,7 @@ import {
 	Filler,
 } from 'chart.js';
 import { WeatherDataEntry } from '@/app/types/weatherTypes';
-import { useThemeColors } from '../../hooks/useThemeColors';
+import { useThemeColors, hexToRgba } from '../../hooks/useThemeColors';
 
 ChartJS.register(
 	CategoryScale,
@@ -63,7 +63,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 				label: 'Average Temperature (°C)',
 				data: averageTemperature,
 				borderColor: themeColors.primary,
-				backgroundColor: themeColors.primary + '33', // 20% opacity
+				backgroundColor: hexToRgba(themeColors.primary, 0.2),
 				fill: true,
 				tension: 0.3,
 			},
@@ -71,7 +71,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 				label: 'Average Wind Speed (m/s)',
 				data: averageWindSpeed,
 				borderColor: themeColors.accent,
-				backgroundColor: themeColors.accent + '33', // 20% opacity
+				backgroundColor: hexToRgba(themeColors.accent, 0.2),
 				fill: true,
 				tension: 0.3,
 			},
@@ -79,7 +79,7 @@ const WeatherOverviewChart: React.FC<WeatherOverviewChartProps> = ({
 				label: 'Average Humidity (%)',
 				data: averageHumidity,
 				borderColor: themeColors.info,
-				backgroundColor: themeColors.info + '33', // 20% opacity
+				backgroundColor: hexToRgba(themeColors.info, 0.2),
 				fill: true,
 				tension: 0.3,
 			},

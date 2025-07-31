@@ -11,7 +11,7 @@ import {
 	Legend,
 	Filler,
 } from 'chart.js';
-import { useThemeColors } from '../../hooks/useThemeColors';
+import { useThemeColors, hexToRgba } from '../../hooks/useThemeColors';
 
 ChartJS.register(
 	CategoryScale,
@@ -42,7 +42,7 @@ const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
 					label: 'Temperature (°C)',
 					data: data.map((entry) => entry.temperature),
 					borderColor: themeColors.primary,
-					backgroundColor: themeColors.primary + '33', // 20% opacity
+					backgroundColor: hexToRgba(themeColors.primary, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
@@ -50,7 +50,7 @@ const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
 					label: 'Wind Speed (m/s)',
 					data: data.map((entry) => entry.windSpeed),
 					borderColor: themeColors.accent,
-					backgroundColor: themeColors.accent + '33', // 20% opacity
+					backgroundColor: hexToRgba(themeColors.accent, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
@@ -58,7 +58,7 @@ const WeatherChart = ({ data }: { data: WeatherDataEntry[] }) => {
 					label: 'Humidity (%)',
 					data: data.map((entry) => entry.humidity),
 					borderColor: themeColors.info,
-					backgroundColor: themeColors.info + '33', // 20% opacity
+					backgroundColor: hexToRgba(themeColors.info, 0.2),
 					fill: true,
 					tension: 0.3,
 				},
