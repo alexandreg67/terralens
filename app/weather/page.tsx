@@ -78,6 +78,10 @@ const WeatherPage: React.FC = () => {
 		setSelectedDay('');
 	};
 
+	const clearError = () => {
+		setError(null);
+	};
+
 	const handleSearchClick = async () => {
 		setError(null);
 		if (cityInput.value.trim().length > 2) {
@@ -166,6 +170,7 @@ const WeatherPage: React.FC = () => {
 							}}
 							loading={loading}
 							error={error}
+							onClearError={clearError}
 						/>
 					</div>
 				</div>

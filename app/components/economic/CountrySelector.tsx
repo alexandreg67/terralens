@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { Country } from '../../types/economicTypes';
+import { useTimeoutMessage } from '../../hooks/useTimeoutMessage';
 
 interface CountrySelectorProps {
 	selectedCountries: string[]; // Array of selected countries
@@ -33,17 +34,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		{ code: 'SA', name: 'Saudi Arabia' },
 	],
 }) => {
-	const [limitMessage, setLimitMessage] = useState<string>('');
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	// Cleanup timeout on unmount
-	useEffect(() => {
-		return () => {
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-		};
-	}, []);
+	const { message: limitMessage, showMessageWithTimeout } = useTimeoutMessage();
 	const sortedCountries = countries.sort((a, b) =>
 		a.name.localeCompare(b.name)
 	);
@@ -63,19 +54,8 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
 		if (updatedSelection.length <= 3) {
 			onCountryChange(updatedSelection);
 		} else {
-			// Limit reached - provide accessible feedback using React state
-			setLimitMessage('3 country limit reached. Deselect a country to choose another.');
-			
-			// Clear any existing timeout
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
-			
-			// Clear the message after 3 seconds
-			timeoutRef.current = setTimeout(() => {
-				setLimitMessage('');
-			}, 3000);
-			
+			// Limit reached - provide accessible feedback using custom hook
+			showMessageWithTimeout('3 country limit reached. Deselect a country to choose another.');
 			return;
 		}
 	};

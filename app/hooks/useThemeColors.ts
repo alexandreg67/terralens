@@ -30,9 +30,9 @@ const defaultColors: ThemeColors = {
 
 // HSL to hex conversion utility - moved outside component to avoid recreations
 const hslToHex = (hsl: string): string => {
-  if (!hsl || hsl === 'none') return '';
+  if (!hsl || hsl === 'none') return '#000000'; // Fallback to black instead of empty string
   const values = hsl.split(' ').map(v => parseFloat(v));
-  if (values.length !== 3) return '';
+  if (values.length !== 3) return '#000000'; // Fallback to black for malformed values
   const [h, s, l] = values;
   const c = (1 - Math.abs(2 * l / 100 - 1)) * s / 100;
   const x = c * (1 - Math.abs((h / 60) % 2 - 1));

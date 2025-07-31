@@ -8,6 +8,7 @@ interface WeatherSearchBarProps {
 	onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 	loading: boolean;
 	error: string | null;
+	onClearError?: () => void;
 }
 
 const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
@@ -17,6 +18,7 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 	onKeyPress,
 	loading,
 	error,
+	onClearError,
 }) => {
 	const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
@@ -56,6 +58,17 @@ const WeatherSearchBar: React.FC<WeatherSearchBarProps> = ({
 						</svg>
 						<span role="alert">{error}</span>
 					</div>
+					{onClearError && (
+						<div className="flex-none">
+							<button
+								className="btn btn-sm btn-ghost"
+								onClick={onClearError}
+								aria-label="Close error message"
+							>
+								✕
+							</button>
+						</div>
+					)}
 				</div>
 			)}
 		</div>
