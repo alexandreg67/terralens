@@ -74,13 +74,16 @@ app/
 
 ## Styling System
 
-The project uses a custom Tailwind theme with DaisyUI:
-- **Primary**: #2C7A7B (teal for main elements)
-- **Secondary**: #1A202C (dark gray)  
-- **Accent**: #E53E3E (red for highlights)
-- **Background**: #F7FAFC (light gray)
+The project uses a custom Tailwind theme with DaisyUI components. The custom `terralens` theme is defined in `tailwind.config.ts`:
 
-Custom theme defined in `tailwind.config.ts` with DaisyUI integration.
+- **Primary**: #2C7A7B (teal)
+- **Secondary**: #1A202C (dark gray)  
+- **Accent**: #E53E3E (red)
+- **Base-100**: #F7FAFC (light background)
+- **Base-200**: #EDF2F7 (medium background)
+- **Base-300**: #E2E8F0 (darker background)
+
+DaisyUI provides pre-built components while maintaining design system consistency.
 
 ## Component Patterns
 
@@ -99,15 +102,27 @@ Custom theme defined in `tailwind.config.ts` with DaisyUI integration.
 
 ## Environment Configuration
 
-The app expects:
+Required environment variables in `.env.local`:
+```bash
+NEXT_PUBLIC_MAPBOX_API_KEY=your_mapbox_token_here
+OPENWEATHER_API_KEY=your_openweather_key_here
+```
+
+External API dependencies:
 - Open-Meteo API (no key required)
 - World Bank API (no key required) 
 - OpenStreetMap Overpass API (no key required)
-- Mapbox token for map rendering (configured in next.config.mjs)
+- Mapbox token for map rendering
+- OpenWeather API for weather icons
+
+Environment validation is handled in `app/config/env.ts`.
 
 ## Development Notes
 
 - Map components require dynamic imports to avoid SSR issues
-- Weather data filtering focuses on current hour onwards
+- Weather data filtering focuses on current hour onwards  
 - Economic data uses latest valid values when null entries exist
 - Geospatial queries use bounding box calculations for area searches
+- OpenWeather API images are allowed in `next.config.mjs` domains
+- Custom hooks in `app/hooks/` provide debouncing, theme colors, and timeout messaging
+- All API routes are in `app/api/` and handle external service integration
